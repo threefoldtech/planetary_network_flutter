@@ -20,10 +20,6 @@ import io.github.chronosx88.yggdrasil.YggdrasilTunService.Companion.VPN_REQUEST_
 
 /** YggdrasilPlugin */
 class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
-    /// The MethodChannel that will the communication between Flutter and native Android
-    ///
-    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-    /// when the Flutter Engine is detached from the Activity
 
     private var channel: MethodChannel? = null
     private lateinit var context: Context
@@ -73,11 +69,11 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else if (call.method == "start_vpn") {
             startVpn()
             Log.d("ygg", "" + "VPN Started");
-            result.success()
+            result.success("")
         } else if (call.method == "stop_vpn") {
             stopVpn()
             Log.d("ygg", "" + "VPN Stopped");
-            result.success()
+            result.success("")
         } else {
             result.notImplemented()
         }

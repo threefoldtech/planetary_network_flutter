@@ -38,7 +38,8 @@ class TestPage extends StatelessWidget {
   String _platformVersion = 'Unknown';
   YggdrasilPlugin plugin = YggdrasilPlugin();
   BuildContext _context;
-  TestPage(){
+
+  TestPage() {
     plugin.setOnReportIp(reportIp);
     initPlatformState();
   }
@@ -68,46 +69,43 @@ class TestPage extends StatelessWidget {
       context: _context,
       child: new AlertDialog(
         title: const Text("Your IP"),
-        content:  new Text(message),
+        content: new Text(message),
         actions: [
           new FlatButton(
             child: const Text("Ok"),
-            onPressed: () => Navigator.pop(_context),
+            onPressed: () {
+              Navigator.pop(_context);
+            },
           ),
         ],
       ),
     );
-
   }
 
-  void reportIp(String ip){
+  void reportIp(String ip) {
     print("EVEN IN THE UI FFS...");
-    showAlertDialog( ip );
+    showAlertDialog(ip);
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     String platformVersion;
     platformVersion = await plugin.platformVersion();
-    var startvpn = await plugin.startVpn();
-
-
-    print(startvpn);
-
-
   }
 
 
   void testAlert(BuildContext context) {
-    var alert = AlertDialog(
-      title: Text("Test"),
-      content: Text("Done..!"),
-    );
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        });
+    plugin.startVpn();
+    //   var alert = AlertDialog(
+    //     title: Text("Test"),
+    //     content: Text("Done..!"),
+    //   );
+    //
+    //   showDialog(
+    //       context: context,
+    //       builder: (BuildContext context) {
+    //         return alert;
+    //       });
+    // }
   }
 }

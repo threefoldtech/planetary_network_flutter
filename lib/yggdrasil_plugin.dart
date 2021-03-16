@@ -28,7 +28,6 @@ class YggdrasilPlugin {
   }
 
   Future<void> _onCall(MethodCall call) async {
-    print("!!!!!!!ONCALL GOT EVENT!!!!!!!!!!!!!!!!11" + call.method);
     switch(call.method) {
       case "reportIp":
         final String ipAddress = call.arguments;
@@ -41,9 +40,8 @@ class YggdrasilPlugin {
     final String version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
-  Future<String> startVpn() async {
-    final String ip = await _channel.invokeMethod('start_vpn'); //@todo notation
+  Future<void> startVpn() async {
+    await _channel.invokeMethod('start_vpn'); //@todo notation
 
-    return ip;
   }
 }

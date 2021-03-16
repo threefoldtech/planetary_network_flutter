@@ -23,8 +23,10 @@ internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
         val regex = Regex("((tcp|tls):\\/\\/(.*?))<\\/")
         val matches = regex.findAll(htmlData)
         val peers = ArrayList<PeerInfo>()
-        matches.forEach { f ->
-            val urlToParse =  f.groupValues[1];
+        var fastPeers = 0;
+
+        for(match in matches){
+            val urlToParse =  match.groupValues[1];
             val uri = URI(urlToParse)
             Log.d("uri", "scheme: " + uri.scheme + " Host: " + uri.host + " port " + uri.port);
             val start = System.currentTimeMillis()
@@ -43,10 +45,19 @@ internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
                 val peer = PeerInfo(scheme, ia, port, ping)
 
                 peers.add(peer)
+                if(ping < 75){
+                    fastPeers++;
+                }
             }catch (e: Exception){
                 Log.d("ping", "Ping failed for host " + uri.host);
             }
+            if(fastPeers > 2){
+                Log.d("ygg", "Found 3 fast hosts (<75ms)");
+                break;
+            }
         }
+
+
         peers.sortBy { it.ping  }
         Log.d("ping", "Lowest ping is  " + peers[0].ping + " followed by " + peers[1].ping);
 

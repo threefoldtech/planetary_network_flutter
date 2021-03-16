@@ -87,8 +87,10 @@ class YggdrasilTunService : VpnService() {
                 val taskRunner = TaskRunner()
 
                 val test: (ArrayList<PeerInfo>) -> Unit =  { data ->
-                    var singlePeer = PeerInfo("tcp://", InetAddress.getByName("212.129.52.193"), 39565, "fr")
-                    val peers = setOf(data[0]); //deserializeStringList2PeerInfoSet(intent.getStringArrayListExtra(CURRENT_PEERS))
+                    if(data.size < 3){
+                        //@todo error not enough available peers
+                    }
+                    val peers = setOf(data[0], data[1], data[2]); //deserializeStringList2PeerInfoSet(intent.getStringArrayListExtra(CURRENT_PEERS))
                     val dns = deserializeStringList2DNSInfoSet(intent.getStringArrayListExtra(CURRENT_DNS))
                     val staticIP: Boolean = intent.getBooleanExtra(STATIC_IP, false)
                     ygg = Yggdrasil()
