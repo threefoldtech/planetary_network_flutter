@@ -93,7 +93,9 @@ class YggdrasilTunService : VpnService() {
                     val peers = setOf(data[0], data[1], data[2]); //deserializeStringList2PeerInfoSet(intent.getStringArrayListExtra(CURRENT_PEERS))
                     val dns = deserializeStringList2DNSInfoSet(intent.getStringArrayListExtra(CURRENT_DNS))
                     val staticIP: Boolean = intent.getBooleanExtra(STATIC_IP, false)
-                    ygg = Yggdrasil()
+                    if(!yggStarted) {
+                        ygg = Yggdrasil()
+                    }
                     setupTunInterface(pi, peers, dns, staticIP)
                     foregroundNotification(FOREGROUND_ID, "Yggdrasil service started")
 

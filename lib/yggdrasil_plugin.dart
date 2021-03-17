@@ -44,4 +44,8 @@ class YggdrasilPlugin {
     await _channel.invokeMethod('start_vpn'); //@todo notation
 
   }
+  Future<void> stopVpn() async {
+    await _channel.invokeMethod('stop_vpn'); //@todo notation
+
+  }
 }

@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6a644f8d-322d-4963-a2c6-7cdf22c29e45" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/BestPeers.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/BestPeers.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilPlugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilPlugin.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilTunService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilTunService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/yggdrasil_plugin.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/yggdrasil_plugin.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -15,7 +11,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[9b2c66af]" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -86,10 +82,12 @@
       <screen x="0" y="387" width="3440" height="1053" />
     </state>
     <state x="2069" y="355" width="1022" height="737" key="SettingsEditor/3440.360.1920.1080/0.387.3440.1053@0.387.3440.1053" timestamp="1615477962397" />
-    <state x="541" y="460" width="653" height="522" key="find.popup" timestamp="1615880250194">
-      <screen x="0" y="387" width="3440" height="1053" />
+    <state x="541" y="125" width="653" height="701" key="find.popup" timestamp="1615986137851">
+      <screen x="0" y="27" width="3440" height="1413" />
     </state>
     <state x="541" y="460" width="653" height="522" key="find.popup/3440.111.1920.1080/0.387.3440.1053@0.387.3440.1053" timestamp="1615880250194" />
+    <state x="541" y="125" width="653" height="701" key="find.popup/3440.360.1920.1080/0.27.3440.1413@0.27.3440.1413" timestamp="1615986137851" />
+    <state x="541" y="460" width="653" height="522" key="find.popup/3440.360.1920.1080/0.387.3440.1053@0.387.3440.1053" timestamp="1615910452948" />
     <state x="523" y="329" width="672" height="678" key="search.everywhere.popup" timestamp="1615882908789">
       <screen x="0" y="387" width="3440" height="1053" />
     </state>
