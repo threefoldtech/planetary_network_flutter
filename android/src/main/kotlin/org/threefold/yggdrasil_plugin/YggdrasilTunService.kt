@@ -100,7 +100,6 @@ class YggdrasilTunService : VpnService() {
                     foregroundNotification(FOREGROUND_ID, "Yggdrasil service started")
 
                 }
-
                 taskRunner.executeAsync(GetBestPeers(), test)
                 isRunning = true
 
@@ -294,6 +293,7 @@ class YggdrasilTunService : VpnService() {
         tunInputStream.close()
         tunOutputStream.close()
         tunInterface!!.close()
+        ygg.stop()
         Log.d(TAG, "Stop is running from service")
     }
 
