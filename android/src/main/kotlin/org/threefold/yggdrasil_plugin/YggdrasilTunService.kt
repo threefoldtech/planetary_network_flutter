@@ -294,7 +294,7 @@ class YggdrasilTunService : VpnService() {
         tunOutputStream.close()
         tunInterface!!.close()
         ygg.stop()
-        Log.d(TAG, "Stop is running from service")
+        Log.d(TAG, "New stop is running from service")
     }
 
     override fun onDestroy() {
