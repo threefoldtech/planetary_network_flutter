@@ -15,7 +15,6 @@ import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dummy.ConduitEndpoint
-
 import io.github.chronosx88.yggdrasil.models.DNSInfo
 import io.github.chronosx88.yggdrasil.models.PeerInfo
 import io.github.chronosx88.yggdrasil.models.config.Peer
@@ -24,6 +23,7 @@ import io.github.chronosx88.yggdrasil.models.config.Utils.Companion.convertPeerI
 import io.github.chronosx88.yggdrasil.models.config.Utils.Companion.deserializeStringList2DNSInfoSet
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import mobile.Mobile
 import mobile.Yggdrasil
 import org.jimber.tools.TaskRunner
@@ -45,7 +45,7 @@ class YggdrasilTunService : VpnService() {
     private val MAX_PACKET_SIZE = Short.MAX_VALUE/2
     private var tunInterface: ParcelFileDescriptor? = null
     private var isRunning = false
-    private var yggStarted = false
+
     private var yggConduitEndpoint: ConduitEndpoint? = null
     companion object {
         private const val TAG = "Yggdrasil-service"
@@ -84,6 +84,7 @@ class YggdrasilTunService : VpnService() {
 
             }
             START -> {
+                isClosed = false;
                 val taskRunner = TaskRunner()
 
                 val test: (ArrayList<PeerInfo>) -> Unit =  { data ->
@@ -93,9 +94,7 @@ class YggdrasilTunService : VpnService() {
                     val peers = setOf(data[0], data[1], data[2]); //deserializeStringList2PeerInfoSet(intent.getStringArrayListExtra(CURRENT_PEERS))
                     val dns = deserializeStringList2DNSInfoSet(intent.getStringArrayListExtra(CURRENT_DNS))
                     val staticIP: Boolean = intent.getBooleanExtra(STATIC_IP, false)
-                    if(!yggStarted) {
-                        ygg = Yggdrasil()
-                    }
+                    ygg = Yggdrasil()
                     setupTunInterface(pi, peers, dns, staticIP)
                     foregroundNotification(FOREGROUND_ID, "Yggdrasil service started")
 
@@ -125,11 +124,11 @@ class YggdrasilTunService : VpnService() {
         YggdrasilReporter.reportIp(address);
 
         var builder =             Builder()
-                    .addAddress(address, 7)
-                    .allowFamily(OsConstants.AF_INET)
-                    .allowBypass()
-                    .setBlocking(true)
-                    .setMtu(MAX_PACKET_SIZE)
+                .addAddress(address, 7)
+                .allowFamily(OsConstants.AF_INET)
+                .allowBypass()
+                .setBlocking(true)
+                .setMtu(MAX_PACKET_SIZE)
 
         if (dns.size > 0) {
             for (d in dns) {
@@ -166,11 +165,11 @@ class YggdrasilTunService : VpnService() {
 
         configJson = gson.toJson(config).toByteArray()
 
-        if(!yggStarted) {
-            Log.d("Ygg", "setting config");
-            yggStarted = true
-            yggConduitEndpoint = ygg.startJSON(configJson)
-        }
+
+        yggConduitEndpoint = ygg.startJSON(configJson)
+
+
+
         Log.d("Ygg", "setdone, setup iostreams");
         setupIOStreams(dns)
         Log.d("Ygg", "threads");
@@ -290,11 +289,12 @@ class YggdrasilTunService : VpnService() {
 
     private fun stopVpn(pi: PendingIntent?) {
         isClosed = true;
+        isRunning = false;
         tunInputStream.close()
         tunOutputStream.close()
         tunInterface!!.close()
         ygg.stop()
-        Log.d(TAG, "New stop is running from service")
+        Log.d(TAG, "Yggdrasil stopped")
     }
 
     override fun onDestroy() {
