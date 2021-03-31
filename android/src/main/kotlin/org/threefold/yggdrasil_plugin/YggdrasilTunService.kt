@@ -55,7 +55,7 @@ class YggdrasilTunService : VpnService() {
         const val START = "START"
         const val CURRENT_PEERS = "CURRENT_PEERS_v1.2.1"
         const val CURRENT_DNS = "CURRENT_DNS_v1.2"
-        const val STATIC_IP = "STATIC_IP_FLAG"
+        const val STATIC_IP = "yggdrasil_STATIC_IP"
         const val UPDATE_DNS = "UPDATE_DNS"
         const val UPDATE_PEERS = "UPDATE_PEERS"
         const val STATUS_START = 7
@@ -64,10 +64,10 @@ class YggdrasilTunService : VpnService() {
         const val STATUS_PEERS_UPDATE = 12
         const val IPv6: String = "IPv6"
         const val MESH_PEERS = "MESH_PEERS"
-        const val signingPrivateKey = "signingPrivateKey"
-        const val signingPublicKey = "signingPublicKey"
-        const val encryptionPrivateKey = "encryptionPrivateKey"
-        const val encryptionPublicKey = "encryptionPublicKey"
+        const val SIGNING_PRIVATE_KEY = "SIGNING_PRIVATE_KEY"
+        const val SIGNING_PUBLIC_KEY = "SIGNING_PUBLIC_KEY"
+        const val ENC_PRIVATE_KEY = "ENC_PRIVATE_KEY"
+        const val ENC_PUBLIC_KEY = "ENC_PUBLIC_KEY"
         const val VPN_REQUEST_CODE = 0x0F
         const val REPORT_IP = "REPORT_IP"
     }
@@ -75,7 +75,7 @@ class YggdrasilTunService : VpnService() {
     private val FOREGROUND_ID = 1338
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("myTag", "YggdrasilTunService");
+        Log.d("ygg", "YggdrasilTunService");
         val pi: PendingIntent? = intent?.getParcelableExtra(PARAM_PINTENT)
         when(intent?.getStringExtra(COMMAND)){
             STOP -> {
@@ -87,19 +87,26 @@ class YggdrasilTunService : VpnService() {
                 isClosed = false;
                 val taskRunner = TaskRunner()
 
-                val test: (ArrayList<PeerInfo>) -> Unit =  { data ->
+                val connectToYggdrasil: (ArrayList<PeerInfo>) -> Unit =  { data ->
                     if(data.size < 3){
                         //@todo error not enough available peers
                     }
                     val peers = setOf(data[0], data[1], data[2]); //deserializeStringList2PeerInfoSet(intent.getStringArrayListExtra(CURRENT_PEERS))
                     val dns = deserializeStringList2DNSInfoSet(intent.getStringArrayListExtra(CURRENT_DNS))
-                    val staticIP: Boolean = intent.getBooleanExtra(STATIC_IP, false)
+                    val staticIP: Boolean = intent.getBooleanExtra(STATIC_IP, true)
+          
+                    var keys = mapOf(SIGNING_PUBLIC_KEY to intent.getStringExtra(SIGNING_PUBLIC_KEY), 
+                                     SIGNING_PRIVATE_KEY to  intent.getStringExtra(SIGNING_PRIVATE_KEY), 
+                                     ENC_PUBLIC_KEY to intent.getStringExtra(ENC_PUBLIC_KEY),
+                                     ENC_PRIVATE_KEY to intent.getStringExtra(ENC_PRIVATE_KEY));
+                       
                     ygg = Yggdrasil()
-                    setupTunInterface(pi, peers, dns, staticIP)
+                    Log.d("ygg", "YggdrasilTunService" + "DO WE HAVE A KEY 2 ???" + keys[SIGNING_PUBLIC_KEY]);
+                    setupTunInterface(pi, peers, dns, keys)
                     foregroundNotification(FOREGROUND_ID, "Yggdrasil service started")
 
                 }
-                taskRunner.executeAsync(GetBestPeers(), test)
+                taskRunner.executeAsync(GetBestPeers(), connectToYggdrasil)
                 isRunning = true
 
 
@@ -154,25 +161,31 @@ class YggdrasilTunService : VpnService() {
             pi: PendingIntent?,
             peers: Set<PeerInfo>,
             dns: MutableSet<DNSInfo>,
-            staticIP: Boolean
+            keys: Map<String, String>
     ) {
-        Log.d("Ygg", "START");
+        Log.d("ygg", "START");
         pi!!.send(STATUS_START)
         var configJson = Mobile.generateConfigJSON()
         val gson = Gson()
         var config = gson.fromJson(String(configJson), Map::class.java).toMutableMap()
-        config = fixConfig(config, peers, staticIP)
+        config = fixConfig(config, peers)
+
+
+        config["SigningPublicKey"] = keys[SIGNING_PUBLIC_KEY];
+        config["SigningPrivateKey"] = keys[SIGNING_PRIVATE_KEY];
+        config["EncryptionPublicKey"] = keys[ENC_PUBLIC_KEY];
+        config["EncryptionPrivateKey"] = keys[ENC_PRIVATE_KEY];
 
         configJson = gson.toJson(config).toByteArray()
-
+        Log.d("ygg", "Configjson, " + gson.toJson(config));  
 
         yggConduitEndpoint = ygg.startJSON(configJson)
 
 
 
-        Log.d("Ygg", "setdone, setup iostreams");
+        Log.d("ygg", "setdone, setup iostreams");
         setupIOStreams(dns)
-        Log.d("Ygg", "threads");
+        Log.d("ygg", "threads");
         thread(start = true) {
             val buffer = ByteArray(MAX_PACKET_SIZE)
             while (!isClosed) {
@@ -184,7 +197,7 @@ class YggdrasilTunService : VpnService() {
                 writePacketsToTun(yggConduitEndpoint!!)
             }
         }
-        Log.d("Ygg", "intent");
+        Log.d("ygg", "intent");
         val intent: Intent = Intent().putExtra(IPv6, address)
         pi.send(this, STATUS_FINISH, intent)
     }
@@ -203,8 +216,7 @@ class YggdrasilTunService : VpnService() {
 
     private fun fixConfig(
             config: MutableMap<Any?, Any?>,
-            peers: Set<PeerInfo>,
-            staticIP: Boolean
+            peers: Set<PeerInfo>
     ): MutableMap<Any?, Any?> {
 
         val whiteList = arrayListOf<String>()
@@ -214,34 +226,7 @@ class YggdrasilTunService : VpnService() {
         config["Peers"] = convertPeerInfoSet2PeerIdSet(peers)
         config["Listen"] = ""
         config["AdminListen"] = "tcp://localhost:9001"
-        config["IfName"] = "tun0"
-        if(staticIP) {
-            val preferences =
-                    PreferenceManager.getDefaultSharedPreferences(this.baseContext)
-            if(preferences.getString(STATIC_IP, null)==null) {
-                val encryptionPublicKey = config["EncryptionPublicKey"].toString()
-                val encryptionPrivateKey = config["EncryptionPrivateKey"].toString()
-                val signingPublicKey = config["SigningPublicKey"].toString()
-                val signingPrivateKey = config["SigningPrivateKey"].toString()
-                preferences.edit()
-                        .putString(signingPrivateKey, signingPrivateKey)
-                        .putString(signingPublicKey, signingPublicKey)
-                        .putString(encryptionPrivateKey, encryptionPrivateKey)
-                        .putString(encryptionPublicKey, encryptionPublicKey)
-                        .putString(STATIC_IP, STATIC_IP).apply()
-            } else {
-                val signingPrivateKey = preferences.getString(signingPrivateKey, null)
-                val signingPublicKey = preferences.getString(signingPublicKey, null)
-                val encryptionPrivateKey = preferences.getString(encryptionPrivateKey, null)
-                val encryptionPublicKey = preferences.getString(encryptionPublicKey, null)
-
-                config["SigningPrivateKey"] = signingPrivateKey
-                config["SigningPublicKey"] = signingPublicKey
-                config["EncryptionPrivateKey"] = encryptionPrivateKey
-                config["EncryptionPublicKey"] = encryptionPublicKey
-            }
-        }
-
+        config["IfName"] = "tun0"  
         (config["SessionFirewall"] as MutableMap<Any, Any>)["Enable"] = false
         //(config["SessionFirewall"] as MutableMap<Any, Any>)["AllowFromDirect"] = true
         //(config["SessionFirewall"] as MutableMap<Any, Any>)["AllowFromRemote"] = true
@@ -256,6 +241,7 @@ class YggdrasilTunService : VpnService() {
             tmpMap["Mobile"] = false
             config["AutoStart"] = tmpMap
         }
+  
         return config
     }
 
