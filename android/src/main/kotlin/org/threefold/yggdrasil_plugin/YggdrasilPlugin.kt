@@ -60,8 +60,6 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     }
 
-  
-
     private fun stopVpn() {
         val intent = Intent(context, YggdrasilTunService::class.java)
         val TASK_CODE = 100
