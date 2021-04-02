@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6a644f8d-322d-4963-a2c6-7cdf22c29e45" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilTunService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilTunService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilPlugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/org/threefold/yggdrasil_plugin/YggdrasilPlugin.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/yggdrasil_plugin.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/yggdrasil_plugin.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,9 +58,10 @@
       <screen x="0" y="387" width="3440" height="1053" />
     </state>
     <state x="2038" y="378" key="#com.intellij.execution.impl.EditConfigurationsDialog/3440.360.1920.1080/0.387.3440.1053@0.387.3440.1053" timestamp="1615477899778" />
-    <state x="643" y="478" width="424" height="491" key="FileChooserDialogImpl" timestamp="1615822374034">
-      <screen x="0" y="387" width="3440" height="1053" />
+    <state x="643" y="251" width="424" height="491" key="FileChooserDialogImpl" timestamp="1617191828144">
+      <screen x="0" y="138" width="3440" height="1302" />
     </state>
+    <state x="643" y="251" key="FileChooserDialogImpl/3440.111.1920.1080/0.138.3440.1302@0.138.3440.1302" timestamp="1617191828144" />
     <state x="643" y="478" width="424" height="491" key="FileChooserDialogImpl/3440.111.1920.1080/0.387.3440.1053@0.387.3440.1053" timestamp="1615822374034" />
     <state width="1674" height="403" key="GridCell.Tab.0.bottom" timestamp="1615905992044">
       <screen x="0" y="387" width="3440" height="1053" />

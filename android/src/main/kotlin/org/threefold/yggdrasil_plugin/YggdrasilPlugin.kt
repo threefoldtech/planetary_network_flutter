@@ -58,7 +58,11 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     
         return true;
 
+        return true;
+
     }
+
+
 
     private fun stopVpn() {
         val intent = Intent(context, YggdrasilTunService::class.java)
@@ -78,9 +82,14 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
         } else if (call.method == "start_vpn") {
+<<<<<<< HEAD
             
             val started = startVpn(call.argument<String>("signingPublicKey")!!, call.argument<String>("signingPrivateKey")!!,  call.argument<String>("encryptionPublicKey")!!,call.argument<String>("encryptionPrivateKey")!!);
             Log.d("ygg", "" + "VPN Started ");
+=======
+            val started = startVpn();
+            Log.d("ygg", "" + "VPN Started");
+>>>>>>> 9ae21edc7e5c11d41d27e70efc134093b27afbe9
             result.success(started)
         } else if (call.method == "stop_vpn") {
             stopVpn()
@@ -111,6 +120,3 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
 
 }
-
-
-
