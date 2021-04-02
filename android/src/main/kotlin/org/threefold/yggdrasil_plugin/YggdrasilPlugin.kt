@@ -30,12 +30,16 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel!!.invokeMethod("reportIp", ip)
         return "";
     }
-    private fun startVpn() {
+
+
+
+    private fun startVpn() : Boolean {
         YggdrasilReporter.onReportIp({ ip -> reportIp(ip) });
 
         val intent = VpnService.prepare(context)
         if (intent!=null){
             activity.startActivityForResult(intent, VPN_REQUEST_CODE)
+            return false;
         }
 
         val intentygg = Intent(context, YggdrasilTunService::class.java)
@@ -44,10 +48,13 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         intentygg.putExtra(YggdrasilTunService.PARAM_PINTENT, pi)
         intentygg.putExtra(YggdrasilTunService.COMMAND, YggdrasilTunService.START)
         intentygg.putExtra(YggdrasilTunService.STATIC_IP, true)
-
         val startResult = activity.startService(intentygg)
 
+        return true;
+
     }
+
+
 
     private fun stopVpn() {
         val intent = Intent(context, YggdrasilTunService::class.java)
@@ -67,9 +74,9 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
         } else if (call.method == "start_vpn") {
-            startVpn()
+            val started = startVpn();
             Log.d("ygg", "" + "VPN Started");
-            result.success("")
+            result.success(started)
         } else if (call.method == "stop_vpn") {
             stopVpn()
             Log.d("ygg", "" + "VPN Stopped");
@@ -84,11 +91,9 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onDetachedFromActivity() {
-
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -96,11 +101,7 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-
     }
 
 
 }
-
-
-
