@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import Yggdrasil
 
 public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -9,6 +10,11 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin {
   }
 
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
+    if (call.method == "getPlatformVersion") {
+      result("iOS " + UIDevice.current.systemVersion)
+      return
+    }
+    
+    result(false)    
   }
 }

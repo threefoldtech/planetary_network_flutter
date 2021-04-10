@@ -67,7 +67,7 @@ class TestPage extends StatelessWidget {
   showAlertDialog(String message) {
     showDialog(
       context: _context,
-      child: new AlertDialog(
+      builder: (_) => new AlertDialog(
         title: const Text("Your IP"),
         content: new Text(message),
         actions: [
@@ -94,8 +94,16 @@ class TestPage extends StatelessWidget {
   }
 
 
-  void testAlert(BuildContext context) {
-    plugin.startVpn();
+  void testAlert(BuildContext context) async {
+    //plugin.startVpn();
+    var result = await plugin.startVpn({
+      'signingPublicKey': 'String',
+      'signingPrivateKey': 'String', 
+      'encryptionPublicKey': 'String',
+      'encryptionPrivateKey': 'String'
+    });
+    print(result);
+
     //   var alert = AlertDialog(
     //     title: Text("Test"),
     //     content: Text("Done..!"),
