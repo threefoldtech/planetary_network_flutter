@@ -1,8 +1,11 @@
 import Flutter
-import UIKit
+import NetworkExtension
 import Yggdrasil
+import UIKit
 
 public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin {
+  var vpnManager: NETunnelProviderManager = NETunnelProviderManager()
+
   public static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(name: "yggdrasil_plugin", binaryMessenger: registrar.messenger())
     let instance = SwiftYggdrasilPlugin()
@@ -12,9 +15,16 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin {
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     if (call.method == "getPlatformVersion") {
       result("iOS " + UIDevice.current.systemVersion)
-      return
+    } else if (call.method == "start_vpn") {
+      let bestPeers = BestPeers()
+      result(bestPeers.GetBestPeers())
+
+
+      result(true);
+    } else if (call.method == "stop_vpn") {
+      result(false);
     }
     
-    result(false)    
+    result(FlutterMethodNotImplemented)
   }
 }

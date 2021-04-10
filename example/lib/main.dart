@@ -96,14 +96,12 @@ class TestPage extends StatelessWidget {
 
   void testAlert(BuildContext context) async {
     //plugin.startVpn();
-    var result = await plugin.startVpn({
+    await plugin.startVpn({
       'signingPublicKey': 'String',
       'signingPrivateKey': 'String', 
       'encryptionPublicKey': 'String',
       'encryptionPrivateKey': 'String'
     });
-    print(result);
-
     //   var alert = AlertDialog(
     //     title: Text("Test"),
     //     content: Text("Done..!"),
