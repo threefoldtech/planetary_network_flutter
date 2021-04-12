@@ -1,11 +1,20 @@
 PODS:
+  - CocoaAsyncSocket (7.6.5)
   - Flutter (1.0.0)
+  - SwiftSocket (2.0.2)
   - yggdrasil_plugin (0.0.1):
+    - CocoaAsyncSocket
     - Flutter
+    - SwiftSocket
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - yggdrasil_plugin (from `.symlinks/plugins/yggdrasil_plugin/ios`)
+
+SPEC REPOS:
+  trunk:
+    - CocoaAsyncSocket
+    - SwiftSocket
 
 EXTERNAL SOURCES:
   Flutter:
@@ -14,9 +23,11 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/yggdrasil_plugin/ios"
 
 SPEC CHECKSUMS:
+  CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  yggdrasil_plugin: abda5b702e6013e85b0bcc2c11acc42c78accf5c
+  SwiftSocket: 6f4c9c63fbc5c1d61188936bb3c599fd546f40ae
+  yggdrasil_plugin: 44f340bab62a2b4cc673ac28dbf4962aa3453ee3
 
-PODFILE CHECKSUM: 324709033fdbc1fa744dac75dde748e9cf475d50
+PODFILE CHECKSUM: 1fdb55652a099787cebcdf2ff01f755f75ce17b9
 
 COCOAPODS: 1.10.1

@@ -17,6 +17,9 @@ A new flutter plugin project.
   s.dependency 'Flutter'
   s.platform = :ios, '8.0'
 
+  s.static_framework = true
+  s.dependency 'CocoaAsyncSocket'
+  s.dependency 'SwiftSocket'
   s.ios.vendored_frameworks = 'Frameworks/Yggdrasil.framework'
 
   # Flutter.framework does not contain a i386 slice.
