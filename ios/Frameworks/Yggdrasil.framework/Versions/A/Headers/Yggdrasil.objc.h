@@ -22,7 +22,6 @@
 @class YggdrasilListener;
 @class YggdrasilPeer;
 @class YggdrasilSession;
-@class YggdrasilSimlink;
 @class YggdrasilSwitchPeer;
 @class YggdrasilSwitchQueue;
 @class YggdrasilSwitchQueues;
@@ -173,11 +172,12 @@ object for each Yggdrasil node you plan to run.
 
 // skipped method Core.GetSwitchPeers with unsupported parameter or return types
 
+// skipped method Core.GetSwitchQueues with unsupported parameter or return types
+
 - (YggdrasilTcpListener* _Nullable)listenTCP:(NSString* _Nullable)uri error:(NSError* _Nullable* _Nullable)error;
 - (YggdrasilTcpListener* _Nullable)listenTLS:(NSString* _Nullable)uri error:(NSError* _Nullable* _Nullable)error;
 // skipped method Core.MyNodeInfo with unsupported parameter or return types
 
-- (YggdrasilSimlink* _Nullable)newSimlink;
 // skipped method Core.NodeID with unsupported parameter or return types
 
 - (BOOL)removeAllowedEncryptionPublicKey:(NSString* _Nullable)bstr error:(NSError* _Nullable* _Nullable)error;
@@ -349,20 +349,6 @@ exchanged for around two minutes.
 // skipped field Session.Uptime with unsupported type: time.Duration
 
 @property (nonatomic) BOOL wasMTUFixed;
-@end
-
-@interface YggdrasilSimlink : NSObject <goSeqRefInterface> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-// skipped field Simlink.Inbox with unsupported type: github.com/Arceliar/phony.Inbox
-
-// skipped method Simlink.Act with unsupported parameter or return types
-
-- (BOOL)setDestination:(YggdrasilSimlink* _Nullable)dest error:(NSError* _Nullable* _Nullable)error;
-- (BOOL)start:(NSError* _Nullable* _Nullable)error;
 @end
 
 /**

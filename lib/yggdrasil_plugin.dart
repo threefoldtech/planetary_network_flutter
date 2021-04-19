@@ -43,6 +43,9 @@ class YggdrasilPlugin {
   Future<bool> startVpn(Map<String, String> keys) async {
     final dynamic result = await _channel.invokeMethod('start_vpn',keys);
     
+    print(result);
+
+    return true;
   
     final bool boolResult = result as bool;
     return boolResult; //@todo notation
