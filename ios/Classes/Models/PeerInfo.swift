@@ -11,6 +11,11 @@ public class PeerInfo {
     var address: String
     var port: UInt16
     var ping: UInt64
+    var addressWithPort: String {
+        get {
+            "\(address):\(port)"
+        }
+    }
     
     init(address: String, port: UInt16, ping: UInt64) {
         self.address = address

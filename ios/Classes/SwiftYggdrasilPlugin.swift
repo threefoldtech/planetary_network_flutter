@@ -5,6 +5,33 @@ import UIKit
 import CocoaAsyncSocket
 
 public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelegate {
+    let vpnService: VpnService
+    
+    override init() {
+        self.vpnService = VpnService()
+        super.init()
+        
+        NotificationCenter.default.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil, using: { notification in
+            NSLog("Yggdrasil: NEVPNStatusDidChange Notification")
+            if let conn = notification.object as? NEVPNConnection {
+                
+                if (conn.status == .connected) {
+                    NSLog("Yggdrasil: Connection made")
+                    
+                    self.vpnService.makeIPCRequests()
+                }
+            }
+        })
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSelfUpdated), name: NSNotification.Name.YggdrasilSelfUpdated, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilPeersUpdated), name: NSNotification.Name.YggdrasilPeersUpdated, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSwitchPeersUpdated), name: NSNotification.Name.YggdrasilSwitchPeersUpdated, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSettingsUpdated), name: NSNotification.Name.YggdrasilSettingsUpdated, object: nil)
+    }
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "yggdrasil_plugin", binaryMessenger: registrar.messenger())
         let instance = SwiftYggdrasilPlugin()
@@ -28,21 +55,45 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
     }
     
     private func startVpn(completionHandler:@escaping (Bool) -> Void) {
-        let vpnService = VpnService()
-        
-        vpnService.initVpn() {
-            
-            vpnService.startVpnTunnel()
-            completionHandler(true)
-            /*let bestPeers = BestPeers()
-            
-            bestPeers.GetBestPeers() { bestPeersResult in
-                NSLog("Success: \(bestPeersResult.isSuccessful)")
-                NSLog("Message: \(bestPeersResult.message ?? "No message")")
-                NSLog("Peers: \(bestPeersResult.peers.count)")
 
-                completionHandler(bestPeersResult.isSuccessful)
-            }*/
+        vpnService.initVpn() { result in
+
+            if (!result) {
+                completionHandler(false)
+                return
+            }
+            
+            self.vpnService.startVpnTunnel()
+            completionHandler(true)
         }
+    }
+    
+    func logYggdrasilData() {
+        
+        NSLog("Yggdrasil Connection Info")
+        NSLog("IP Address: \(self.vpnService.yggdrasilSelfIP)")
+        NSLog("Subnet: \(self.vpnService.yggdrasilSelfSubnet)")
+
+        //var peerString = String(data: try! JSONSerialization.data(withJSONObject: peer, options: .prettyPrinted), encoding: .utf8)!
+    }
+    
+    @objc func onYggdrasilSelfUpdated(notification: NSNotification) {
+        NSLog("Yggdrasil: Notification onYggdrasilSelfUpdated received")
+        self.logYggdrasilData()
+    }
+    
+    @objc func onYggdrasilPeersUpdated(notification: NSNotification) {
+        NSLog("Yggdrasil: Notification onYggdrasilPeersUpdated received")
+        self.logYggdrasilData()
+    }
+    
+    @objc func onYggdrasilSwitchPeersUpdated(notification: NSNotification) {
+        NSLog("Yggdrasil: Notification onYggdrasilSwitchPeersUpdated received")
+        self.logYggdrasilData()
+    }
+    
+    @objc func onYggdrasilSettingsUpdated(notification: NSNotification) {
+        NSLog("Yggdrasil: Notification onYggdrasilSettingsUpdated received")
+        self.logYggdrasilData()
     }
 }

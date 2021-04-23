@@ -9,23 +9,12 @@ import UIKit
 import Yggdrasil
 import NetworkExtension
 
-class PlatformItemSource: NSObject, UIActivityItemSource {
-    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return "yggdrasil.conf"
-    }
-    
-    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        return nil
-    }
-}
-
-class ConfigurationProxy: PlatformItemSource {
+class ConfigurationProxy {
 
     private var json: Data? = nil
     private var dict: [String: Any]? = nil
     
-    override init() {
-        super.init()
+    init() {
         self.json = MobileGenerateConfigJSON()
         do {
             try self.convertToDict()
@@ -41,7 +30,6 @@ class ConfigurationProxy: PlatformItemSource {
     }
     
     init(json: Data) throws {
-        super.init()
         self.json = json
         try self.convertToDict()
     }
@@ -137,11 +125,11 @@ class ConfigurationProxy: PlatformItemSource {
         }
     }
     
-    func save(to manager: inout NETunnelProviderManager) throws {
+    func save(to manager: inout NETunnelProviderManager, completionHandler:@escaping (Bool) -> Void) throws {
         self.fix()
         if let data = self.data() {
             let providerProtocol = NETunnelProviderProtocol()
-            providerProtocol.providerBundleIdentifier = "org.jimber.yggdrasil"
+            providerProtocol.providerBundleIdentifier = "org.jimber.yggdrasil.extension"
             providerProtocol.providerConfiguration = [ "json": data ]
             providerProtocol.serverAddress = "yggdrasil"
             providerProtocol.username = self.get("EncryptionPublicKey") as? String ?? "(unknown public key)"
@@ -170,9 +158,12 @@ class ConfigurationProxy: PlatformItemSource {
             manager.saveToPreferences(completionHandler: { (error:Error?) in
                 if let error = error {
                     print(error)
+                    completionHandler(false)
                 } else {
                     print("Save successfully")
-                    NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettingsUpdated, object: self)
+                    completionHandler(true)
+                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: ""), object: self)
+                    //NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettingsUpdated, object: self)
                 }
             })
         }
@@ -185,21 +176,4 @@ class ConfigurationProxy: PlatformItemSource {
     private func convertToJson() throws {
         self.json = try JSONSerialization.data(withJSONObject: self.dict as Any, options: .prettyPrinted)
     }
-    
-    #if canImport(UIKit)
-    override func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-        return "yggdrasil.conf"
-    }
-    
-    override func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
-        return self.data()
-    }
-    
-    func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
-        if let pubkey = self.get("EncryptionPublicKey") as? String, pubkey.count > 56 {
-            return "yggdrasil-\(pubkey.dropFirst(56)).conf.json"
-        }
-        return "yggdrasil.conf.json"
-    }
-    #endif
 }
