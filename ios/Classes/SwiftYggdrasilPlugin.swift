@@ -2,11 +2,16 @@ import Flutter
 import NetworkExtension
 import Yggdrasil
 import UIKit
-import CocoaAsyncSocket
 
-public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelegate {
-    let vpnService: VpnService
-    
+enum ChannelName {
+    static let methodChannel = "yggdrasil_plugin"
+    static let eventChannel = "yggdrasil_plugin/events"
+}
+
+public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
+    private let vpnService: VpnService
+    private var eventSink: FlutterEventSink?
+
     override init() {
         self.vpnService = VpnService()
         super.init()
@@ -25,6 +30,8 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSelfUpdated), name: NSNotification.Name.YggdrasilSelfUpdated, object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSelfIPUpdated), name: NSNotification.Name.YggdrasilSelfIPUpdated, object: nil)
+        
         NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilPeersUpdated), name: NSNotification.Name.YggdrasilPeersUpdated, object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSwitchPeersUpdated), name: NSNotification.Name.YggdrasilSwitchPeersUpdated, object: nil)
@@ -33,10 +40,13 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "yggdrasil_plugin", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: ChannelName.methodChannel, binaryMessenger: registrar.messenger())
         let instance = SwiftYggdrasilPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
         registrar.addApplicationDelegate(instance)
+        
+        let eventChannel = FlutterEventChannel(name: ChannelName.eventChannel, binaryMessenger: registrar.messenger())
+        eventChannel.setStreamHandler(instance)
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -44,7 +54,13 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
         if (call.method == "getPlatformVersion") {
             result("iOS " + UIDevice.current.systemVersion)
         } else if (call.method == "start_vpn") {
-            startVpn()
+            guard let dictionary = call.arguments as? Dictionary<String, String>,
+                  let keys = YggdrasilKeys.Create(dictionary: dictionary) else {
+                result(false)
+                return
+            }
+            
+            startVpn(with: keys)
             result(true)
         } else if (call.method == "stop_vpn") {
             stopVpn()
@@ -54,15 +70,32 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
         result(FlutterMethodNotImplemented)
     }
     
+    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        self.eventSink = events
+        return nil
+    }
+    
+    private func sendIpAddressEvent() {
+        guard let eventSink = eventSink else {
+          return
+        }
+
+        eventSink(self.vpnService.yggdrasilSelfIP)
+    }
+    
+    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        return nil
+    }
+    
     //private func startVpn(completionHandler:@escaping (Bool) -> Void) {
-    private func startVpn() {
+    private func startVpn(with keys: YggdrasilKeys) {
         
         if !vpnService.canStartVPNTunnel() {
             NSLog("Yggdrasil: Cannot start VPN tunnel")
             return
         }
         
-        vpnService.initVPNConfiguration() { result in
+        vpnService.initVPNConfiguration(with: keys) { result in
             if (!result) {
                 NSLog("Yggdrasil: Could not init VPN configuration")
                 return
@@ -90,6 +123,13 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
     @objc func onYggdrasilSelfUpdated(notification: NSNotification) {
         NSLog("Yggdrasil: Notification onYggdrasilSelfUpdated received")
         self.logYggdrasilData()
+    }
+    
+    @objc func onYggdrasilSelfIPUpdated(notification: NSNotification) {
+        NSLog("Yggdrasil: Notification onYggdrasilSelfIPUpdated received")
+        self.logYggdrasilData()
+        
+        sendIpAddressEvent()
     }
     
     @objc func onYggdrasilPeersUpdated(notification: NSNotification) {

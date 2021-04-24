@@ -8,11 +8,14 @@ typedef void onReportIpFnc(String ip);
 class YggdrasilPlugin {
 
   MethodChannel _channel =  const MethodChannel('yggdrasil_plugin');
+  EventChannel _eventChannel = const EventChannel('yggdrasil_plugin/events');
   onReportIpFnc _reportFnc;
   static final YggdrasilPlugin _singleton = YggdrasilPlugin._internal();
 
   init(){
     _singleton._channel.setMethodCallHandler(_onCall);
+    _singleton._eventChannel.receiveBroadcastStream().listen(_onEvent, onError: _onError);
+
   }
 
   factory YggdrasilPlugin() {
@@ -49,5 +52,13 @@ class YggdrasilPlugin {
   Future<void> stopVpn() async {
      await _channel.invokeMethod('stop_vpn'); //@todo notation
 
+  }
+
+  void _onEvent(Object event) {
+    _reportFnc("$event");
+  }
+
+  void _onError(Object error) {
+    
   }
 }

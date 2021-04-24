@@ -27,7 +27,7 @@ class VpnService {
         bestPeersService = BestPeersService()
     }
     
-    func initVPNConfiguration(completionHandler:@escaping (Bool) -> Void) {
+    func initVPNConfiguration(with keys: YggdrasilKeys, completionHandler:@escaping (Bool) -> Void) {
         loadPreferences {
             self.getVPNConfiguration() { result, config in
                 if (!result) {
@@ -40,7 +40,12 @@ class VpnService {
                     completionHandler(false)
                     return
                 }
-                
+                /*
+                config.set("SigningPublicKey", to: keys.signingPublicKey)
+                config.set("SigningPrivateKey", to: keys.signingPrivateKey)
+                config.set("EncryptionPublicKey", to: keys.encryptionPublicKey)
+                config.set("EncryptionPrivateKey", to: keys.encryptionPrivateKey)
+                */
                 self.saveConfiguration(config) { result in
                     /// loadPreferences must be called again after saving VPN configuration for the first time to avoid error: The operation couldn’t be completed. (NEVPNErrorDomain error 1.)
                     self.loadPreferences {
@@ -131,6 +136,7 @@ class VpnService {
     func startVpnTunnel() {
         do {
             NSLog("Yggdrasil: Start VPN Tunnel")
+            self.yggdrasilSelfIP = "N/A"
             try self.vpnManager.connection.startVPNTunnel()
         } catch {
             NSLog(error.localizedDescription)
@@ -147,8 +153,12 @@ class VpnService {
         }
         if let session = self.vpnManager.connection as? NETunnelProviderSession {
             try? session.sendProviderMessage("address".data(using: .utf8)!) { (address) in
-                self.yggdrasilSelfIP = String(data: address!, encoding: .utf8)!
-                NotificationCenter.default.post(name: .YggdrasilSelfUpdated, object: nil)
+                
+                let address = String(data: address!, encoding: .utf8)!
+                if (self.yggdrasilSelfIP != address) {
+                    self.yggdrasilSelfIP = address
+                    NotificationCenter.default.post(name: .YggdrasilSelfIPUpdated, object: nil)
+                }
             }
             try? session.sendProviderMessage("subnet".data(using: .utf8)!) { (subnet) in
                 self.yggdrasilSelfSubnet = String(data: subnet!, encoding: .utf8)!
