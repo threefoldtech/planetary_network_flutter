@@ -161,9 +161,8 @@ class ConfigurationProxy {
                     completionHandler(false)
                 } else {
                     print("Save successfully")
+                    NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettingsUpdated, object: self)
                     completionHandler(true)
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: ""), object: self)
-                    //NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettingsUpdated, object: self)
                 }
             })
         }

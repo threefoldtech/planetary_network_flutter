@@ -17,6 +17,7 @@
 		7E75E6D9262DCF29000C2EBB /* Runner Network Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 7E75E6D0262DCF29000C2EBB /* Runner Network Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7E75E6FE262DD5C4000C2EBB /* Yggdrasil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E75E6FD262DD5C4000C2EBB /* Yggdrasil.framework */; };
 		7E75E703262DD640000C2EBB /* ConfigurationProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E75E702262DD640000C2EBB /* ConfigurationProxy.swift */; };
+		7E75E7CA2634139E000C2EBB /* NSExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E75E7C92634139E000C2EBB /* NSExtension.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -73,6 +74,7 @@
 		7E75E6D6262DCF29000C2EBB /* Runner_Network_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner_Network_Extension.entitlements; sourceTree = "<group>"; };
 		7E75E6FD262DD5C4000C2EBB /* Yggdrasil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Yggdrasil.framework; path = Frameworks/Yggdrasil.framework; sourceTree = "<group>"; };
 		7E75E702262DD640000C2EBB /* ConfigurationProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationProxy.swift; sourceTree = "<group>"; };
+		7E75E7C92634139E000C2EBB /* NSExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSExtension.swift; sourceTree = "<group>"; };
 		843BDB7535D2E3D1D3592708 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		941E15719F1697AC8733FF53 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
@@ -109,12 +111,21 @@
 		7E75E6D2262DCF29000C2EBB /* Runner Network Extension */ = {
 			isa = PBXGroup;
 			children = (
+				7E75E7CC263413CF000C2EBB /* Extensions */,
 				7E75E702262DD640000C2EBB /* ConfigurationProxy.swift */,
 				7E75E6D3262DCF29000C2EBB /* PacketTunnelProvider.swift */,
 				7E75E6D5262DCF29000C2EBB /* Info.plist */,
 				7E75E6D6262DCF29000C2EBB /* Runner_Network_Extension.entitlements */,
 			);
 			path = "Runner Network Extension";
+			sourceTree = "<group>";
+		};
+		7E75E7CC263413CF000C2EBB /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				7E75E7C92634139E000C2EBB /* NSExtension.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		9387A093EFFAB87EB553BAE1 /* Pods */ = {
@@ -364,6 +375,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E75E6D4262DCF29000C2EBB /* PacketTunnelProvider.swift in Sources */,
+				7E75E7CA2634139E000C2EBB /* NSExtension.swift in Sources */,
 				7E75E703262DD640000C2EBB /* ConfigurationProxy.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

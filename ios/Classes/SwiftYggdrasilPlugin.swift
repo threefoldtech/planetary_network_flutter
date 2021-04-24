@@ -14,7 +14,7 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
         NotificationCenter.default.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil, using: { notification in
             NSLog("Yggdrasil: NEVPNStatusDidChange Notification")
             if let conn = notification.object as? NEVPNConnection {
-                
+                NSLog("Yggdrasil: ConnectionStatus \(conn.status.rawValue)")
                 if (conn.status == .connected) {
                     NSLog("Yggdrasil: Connection made")
                     
@@ -44,28 +44,38 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, GCDAsyncSocketDelega
         if (call.method == "getPlatformVersion") {
             result("iOS " + UIDevice.current.systemVersion)
         } else if (call.method == "start_vpn") {
-            startVpn() { success in
-                result(success)
-            }
+            startVpn()
+            result(true)
         } else if (call.method == "stop_vpn") {
-            result(false);
+            stopVpn()
+            result(true);
         }
     
         result(FlutterMethodNotImplemented)
     }
     
-    private func startVpn(completionHandler:@escaping (Bool) -> Void) {
-
-        vpnService.initVpn() { result in
-
+    //private func startVpn(completionHandler:@escaping (Bool) -> Void) {
+    private func startVpn() {
+        
+        if !vpnService.canStartVPNTunnel() {
+            NSLog("Yggdrasil: Cannot start VPN tunnel")
+            return
+        }
+        
+        vpnService.initVPNConfiguration() { result in
             if (!result) {
-                completionHandler(false)
+                NSLog("Yggdrasil: Could not init VPN configuration")
                 return
             }
             
+            NSLog("Yggdrasil: Start VPN tunnel")
             self.vpnService.startVpnTunnel()
-            completionHandler(true)
         }
+    }
+    
+    private func stopVpn() {
+        NSLog("Yggdrasil: Stop VPN tunnel")
+        self.vpnService.stopVpnTunnel()
     }
     
     func logYggdrasilData() {

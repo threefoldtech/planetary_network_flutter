@@ -9,13 +9,11 @@ import Foundation
 import NetworkExtension
 
 class VpnService {
-    var vpnManager: NETunnelProviderManager = NETunnelProviderManager()
-    var bestPeers: BestPeers = BestPeers()
+    var vpnManager: NETunnelProviderManager
+    let bestPeersService: BestPeersService
     
     let yggdrasilComponent = "org.jimber.yggdrasil.extension"
-    
     var yggdrasilConfig: ConfigurationProxy? = nil
-    
     var yggdrasilAdminTimer: DispatchSourceTimer?
     var yggdrasilSelfIP: String = "N/A"
     var yggdrasilSelfSubnet: String = "N/A"
@@ -23,8 +21,52 @@ class VpnService {
     var yggdrasilPeers: [[String: Any]] = [[:]]
     var yggdrasilSwitchPeers: [[String: Any]] = [[:]]
     var yggdrasilNodeInfo: [String: Any] = [:]
+
+    init() {
+        vpnManager = NETunnelProviderManager()
+        bestPeersService = BestPeersService()
+    }
     
-    func initVpn(completionHandler:@escaping (Bool) -> Void) {
+    func initVPNConfiguration(completionHandler:@escaping (Bool) -> Void) {
+        loadPreferences {
+            self.getVPNConfiguration() { result, config in
+                if (!result) {
+                    completionHandler(false)
+                    return
+                }
+                
+                guard let config = config else {
+                    NSLog("Yggdrasil: Could not retrieve VPN configuration")
+                    completionHandler(false)
+                    return
+                }
+                
+                self.saveConfiguration(config) { result in
+                    /// loadPreferences must be called again after saving VPN configuration for the first time to avoid error: The operation couldn’t be completed. (NEVPNErrorDomain error 1.)
+                    self.loadPreferences {
+                        completionHandler(result)
+                    }
+                }
+            }
+        }
+    }
+    
+    private func saveConfiguration(_ config: ConfigurationProxy, completionHandler:@escaping (Bool) -> Void) {
+        
+        self.yggdrasilConfig = config
+        self.vpnManager.localizedDescription = "Yggdrasil"
+        self.vpnManager.isEnabled = true
+        
+        do {
+            try config.save(to: &self.vpnManager) { result in
+                completionHandler(result)
+            }
+        } catch {
+            completionHandler(false)
+        }
+    }
+    
+    private func loadPreferences(completionHandler:@escaping () -> Void) {
         NETunnelProviderManager.loadAllFromPreferences { (savedManagers: [NETunnelProviderManager]?, error: Error?) in
             if let error = error {
                 print(error)
@@ -44,63 +86,41 @@ class VpnService {
                     print(error)
                 }
                 
-                self.getProtocolConfiguration() { result, config in
-                    if (!result) {
-                        completionHandler(false)
-                        return
-                    }
-                    
-                    self.yggdrasilConfig = config
-                    self.vpnManager.localizedDescription = "Yggdrasil"
-                    self.vpnManager.isEnabled = true
-                    
-                    guard let config = self.yggdrasilConfig else {
-                        completionHandler(false)
-                        return
-                    }
-                    
-                    do {
-                        try config.save(to: &self.vpnManager) { result in
-                            completionHandler(result)
-                        }
-                    } catch {
-                        completionHandler(false)
-                    }
-                }
+                completionHandler()
             })
         }
     }
     
-    func getProtocolConfiguration(completionHandler:@escaping (Bool, ConfigurationProxy?) -> Void) {
+    private func getVPNConfiguration(completionHandler:@escaping (Bool, ConfigurationProxy?) -> Void) {
         if let vpnConfig = self.vpnManager.protocolConfiguration as? NETunnelProviderProtocol,
             let confJson = vpnConfig.providerConfiguration!["json"] as? Data {
             
-            print("Found existing protocol configuration")
+            NSLog("Yggdrasil: Found existing VPN configuration")
             let config = try? ConfigurationProxy(json: confJson)
             completionHandler(true, config)
             
         } else  {
             
-            print("Generating new protocol configuration")
-            self.generateNewProtocolConfiguration() { result, yggdrasilConfig in
+            NSLog("Yggdrasil: Generating new VPN configuration")
+            self.generateVPNConfiguration() { result, yggdrasilConfig in
                 completionHandler(result, yggdrasilConfig)
             }
             
         }
     }
     
-    func generateNewProtocolConfiguration(completionHandler:@escaping (Bool, ConfigurationProxy?) -> Void) {
+    private func generateVPNConfiguration(completionHandler:@escaping (Bool, ConfigurationProxy?) -> Void) {
         let config = ConfigurationProxy()
         
-        self.bestPeers.GetBestPeers() { bestPeersResult in
+        self.bestPeersService.GetBestPeers() { bestPeersResult in
             
             if (!bestPeersResult.isSuccessful) {
                 completionHandler(false, nil)
                 return
             }
             
-            for peer in bestPeersResult.peers {
-                NSLog("Adding peer \(peer.addressWithPort)")
+            for peer in bestPeersResult.peers.prefix(3) {
+                NSLog("Yggdrasil: Adding peer \(peer.addressWithPort)")
                 config.add(peer.addressWithPort, in: "Peers")
             }
             
@@ -120,7 +140,6 @@ class VpnService {
     func stopVpnTunnel() {
         self.vpnManager.connection.stopVPNTunnel()
     }
-    
     
     func makeIPCRequests() {
         if self.vpnManager.connection.status != .connected {
@@ -152,5 +171,9 @@ class VpnService {
                 }
             }
         }
+    }
+    
+    func canStartVPNTunnel() -> Bool {
+        return self.vpnManager.connection.status == .disconnected ||             self.vpnManager.connection.status == .invalid
     }
 }

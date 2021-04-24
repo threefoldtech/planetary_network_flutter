@@ -1,6 +1,5 @@
 import Foundation
 import SwiftSocket
-import CocoaAsyncSocket
 
 public class BestPeersResult {
     var isSuccessful: Bool
@@ -22,7 +21,7 @@ public class BestPeersResult {
     }
 }
 
-public class BestPeers : NSObject, GCDAsyncSocketDelegate {
+public class BestPeersService : NSObject {
     var peers = [PeerInfo]()
     
     public func GetBestPeers(completionHandler: (BestPeersResult) -> Void) -> Void {
@@ -48,13 +47,13 @@ public class BestPeers : NSObject, GCDAsyncSocketDelegate {
                 var split = fullAddress.components(separatedBy: ":")
                 let port = Int32(split.popLast()!)!
                 let address = split.joined(separator: ":")
-                let addressWithoutPrefix = address.replacingOccurrences(of: "tls://", with: "")
+                    .replacingOccurrences(of: "tls://", with: "")
                     .replacingOccurrences(of: "tcp://", with: "")
                                 
-                NSLog("Connect to \(fullAddress)")
+                NSLog("Ping \(fullAddress)")
                 
                 let startTime = DispatchTime.now()
-                let client = TCPClient(address: addressWithoutPrefix, port: port)
+                let client = TCPClient(address: address, port: port)
                 switch client.connect(timeout: 1) {
                     case .success:
                         let endTime = DispatchTime.now()
@@ -68,10 +67,11 @@ public class BestPeers : NSObject, GCDAsyncSocketDelegate {
                             fastPeers += 1
                         }
                     case .failure:
-                        NSLog("Ping failed for host \(addressWithoutPrefix)")
+                        NSLog("Ping failed for host \(address)")
                 }
                 
                 if (fastPeers > 2) {
+                    NSLog("Found 3 fast hosts (<75ms)");
                     stop.pointee = true
                 }
             }
@@ -81,7 +81,7 @@ public class BestPeers : NSObject, GCDAsyncSocketDelegate {
             }
             
             completionHandler(BestPeersResult.Success(peers: peers))
-        } catch let error {
+        } catch {
             completionHandler(BestPeersResult.Error(message: error.localizedDescription))
         }
     }

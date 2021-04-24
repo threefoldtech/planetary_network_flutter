@@ -14,7 +14,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     var yggdrasilConfig: ConfigurationProxy?
     
     override init() {
-        NSLog("Init PacketTunnelProvider")
         super.init()
     }
     

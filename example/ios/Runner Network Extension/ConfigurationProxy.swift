@@ -160,8 +160,7 @@ class ConfigurationProxy {
                     print(error)
                 } else {
                     print("Save successfully")
-                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: ""), object: self)
-                    //NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettingsUpdated, object: self)
+                    NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettingsUpdated, object: self)
                 }
             })
         }

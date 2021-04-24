@@ -50,16 +50,26 @@ class TestPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text("Test")),
       body: Container(
-        child: Center(
-          child: RaisedButton(
-            color: Colors.redAccent,
-            textColor: Colors.white,
-            onPressed: () {
-              testAlert(context);
-            },
-            child: Text("PressMe"),
-          ),
-        ),
+          child: new Row (
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            RaisedButton(
+              color: Colors.redAccent,
+              textColor: Colors.white,
+              onPressed: () {
+                startVPN(context);
+              },
+              child: Text("Start"),
+            ),
+            RaisedButton(
+              color: Colors.redAccent,
+              textColor: Colors.white,
+              onPressed: () {
+                stopVPN(context);
+              },
+              child: Text("Stop"),
+            )
+          ])
       ),
     );
   }
@@ -94,24 +104,16 @@ class TestPage extends StatelessWidget {
   }
 
 
-  void testAlert(BuildContext context) async {
-    //plugin.startVpn();
+  void startVPN(BuildContext context) async {
     await plugin.startVpn({
-      'signingPublicKey': 'String',
-      'signingPrivateKey': 'String', 
-      'encryptionPublicKey': 'String',
-      'encryptionPrivateKey': 'String'
+      'signingPublicKey': 'signingPublicKey',
+      'signingPrivateKey': 'signingPrivateKey', 
+      'encryptionPublicKey': 'encryptionPublicKey',
+      'encryptionPrivateKey': 'encryptionPrivateKey'
     });
-    //   var alert = AlertDialog(
-    //     title: Text("Test"),
-    //     content: Text("Done..!"),
-    //   );
-    //
-    //   showDialog(
-    //       context: context,
-    //       builder: (BuildContext context) {
-    //         return alert;
-    //       });
-    // }
+  }
+
+  void stopVPN(BuildContext context) async {
+    await plugin.stopVpn();
   }
 }
