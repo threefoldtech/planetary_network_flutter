@@ -133,13 +133,16 @@ class VpnService {
         }
     }
     
-    func startVpnTunnel() {
+    func startVpnTunnel(completionHandler:@escaping (Bool) -> Void) {
         do {
             NSLog("Yggdrasil: Start VPN Tunnel")
             self.yggdrasilSelfIP = "N/A"
+            
             try self.vpnManager.connection.startVPNTunnel()
+            completionHandler(true)
         } catch {
             NSLog(error.localizedDescription)
+            completionHandler(false)
         }
     }
     

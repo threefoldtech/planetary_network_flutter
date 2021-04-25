@@ -59,14 +59,15 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
                 return
             }
             
-            startVpn(with: keys)
-            result(true)
+            startVpn(with: keys) { success in
+                result(success)
+            }
         } else if (call.method == "stop_vpn") {
             stopVpn()
             result(true);
+        } else {
+            result(FlutterMethodNotImplemented)
         }
-    
-        result(FlutterMethodNotImplemented)
     }
     
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
@@ -86,21 +87,27 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
         return nil
     }
     
-    private func startVpn(with keys: YggdrasilKeys) {
+    private func startVpn(with keys: YggdrasilKeys, completionHandler:@escaping (Bool) -> Void) {
         
         if !vpnService.canStartVPNTunnel() {
             NSLog("Yggdrasil: Cannot start VPN tunnel")
+            
+            completionHandler(false)
             return
         }
         
         vpnService.initVPNConfiguration(with: keys) { result in
             if (!result) {
                 NSLog("Yggdrasil: Could not init VPN configuration")
+                
+                completionHandler(false)
                 return
             }
             
             NSLog("Yggdrasil: Start VPN tunnel")
-            self.vpnService.startVpnTunnel()
+            self.vpnService.startVpnTunnel() { result in
+                completionHandler(result)
+            }
         }
     }
     
