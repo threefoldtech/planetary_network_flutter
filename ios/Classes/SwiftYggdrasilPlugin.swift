@@ -17,7 +17,6 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
         super.init()
         
         NotificationCenter.default.addObserver(forName: .NEVPNStatusDidChange, object: nil, queue: nil, using: { notification in
-            NSLog("Yggdrasil: NEVPNStatusDidChange Notification")
             if let conn = notification.object as? NEVPNConnection {
                 NSLog("Yggdrasil: ConnectionStatus \(conn.status.rawValue)")
                 if (conn.status == .connected) {
@@ -87,7 +86,6 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
         return nil
     }
     
-    //private func startVpn(completionHandler:@escaping (Bool) -> Void) {
     private func startVpn(with keys: YggdrasilKeys) {
         
         if !vpnService.canStartVPNTunnel() {
@@ -112,12 +110,11 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     }
     
     func logYggdrasilData() {
-        
-        NSLog("Yggdrasil Connection Info")
+        NSLog("Yggdrasil: Connection Info")
         NSLog("IP Address: \(self.vpnService.yggdrasilSelfIP)")
         NSLog("Subnet: \(self.vpnService.yggdrasilSelfSubnet)")
 
-        //var peerString = String(data: try! JSONSerialization.data(withJSONObject: peer, options: .prettyPrinted), encoding: .utf8)!
+        //var peer = String(data: try! JSONSerialization.data(withJSONObject: peer, options: .prettyPrinted), encoding: .utf8)!
     }
     
     @objc func onYggdrasilSelfUpdated(notification: NSNotification) {

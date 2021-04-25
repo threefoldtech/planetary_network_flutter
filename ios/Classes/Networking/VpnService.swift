@@ -40,12 +40,12 @@ class VpnService {
                     completionHandler(false)
                     return
                 }
-                /*
+                
                 config.set("SigningPublicKey", to: keys.signingPublicKey)
                 config.set("SigningPrivateKey", to: keys.signingPrivateKey)
                 config.set("EncryptionPublicKey", to: keys.encryptionPublicKey)
                 config.set("EncryptionPrivateKey", to: keys.encryptionPrivateKey)
-                */
+                
                 self.saveConfiguration(config) { result in
                     /// loadPreferences must be called again after saving VPN configuration for the first time to avoid error: The operation couldn’t be completed. (NEVPNErrorDomain error 1.)
                     self.loadPreferences {
