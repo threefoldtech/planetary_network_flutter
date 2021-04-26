@@ -42,8 +42,9 @@ public class BestPeersService : NSObject {
                 guard let group = result?.range(at: 1), let range = Range(group, in: htmlData) else {
                     return
                 }
-                
+            
                 let fullAddress = String(htmlData[range])
+                let scheme = fullAddress.contains("tls://") ? Scheme.tls : Scheme.tcp
                 var split = fullAddress.components(separatedBy: ":")
                 let port = Int32(split.popLast()!)!
                 let address = split.joined(separator: ":")
@@ -59,7 +60,7 @@ public class BestPeersService : NSObject {
                         let endTime = DispatchTime.now()
                         let ping = self.CalculateMillisecondsBetween(startTime, endTime)
                         
-                        let peer = PeerInfo(address: client.address, port: UInt16(client.port), ping: ping)
+                        let peer = PeerInfo(scheme: scheme, address: client.address, port: UInt16(client.port), ping: ping)
                         
                         peers.append(peer)
                         

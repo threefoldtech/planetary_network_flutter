@@ -7,19 +7,25 @@
 
 import Foundation
 
+enum Scheme {
+    case tcp
+    case tls
+}
+
 public class PeerInfo {
     var address: String
     var port: UInt16
     var ping: UInt64
-    var addressWithPort: String {
-        get {
-            "\(address):\(port)"
-        }
-    }
+    var scheme: Scheme
     
-    init(address: String, port: UInt16, ping: UInt64) {
+    init(scheme: Scheme, address: String, port: UInt16, ping: UInt64) {
+        self.scheme = scheme
         self.address = address
         self.port = port
         self.ping = ping
+    }
+    
+    func toString() -> String {
+        return "\(scheme)://\(address):\(port)"
     }
 }

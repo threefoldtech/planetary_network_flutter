@@ -125,8 +125,8 @@ class VpnService {
             }
             
             for peer in bestPeersResult.peers.prefix(3) {
-                NSLog("Yggdrasil: Adding peer \(peer.addressWithPort)")
-                config.add(peer.addressWithPort, in: "Peers")
+                NSLog("Yggdrasil: Adding peer \(peer.toString())")
+                config.add(peer.toString(), in: "Peers")
             }
             
             completionHandler(true, config)
