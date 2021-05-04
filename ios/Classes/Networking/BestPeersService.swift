@@ -65,6 +65,7 @@ public class BestPeersService : NSObject {
                         peers.append(peer)
                         
                         if (ping < 75) {
+                            NSLog("Found fast host \(address)")
                             fastPeers += 1
                         }
                     case .failure:

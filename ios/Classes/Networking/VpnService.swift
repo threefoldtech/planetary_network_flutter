@@ -101,9 +101,10 @@ class VpnService {
             let confJson = vpnConfig.providerConfiguration!["json"] as? Data {
             
             NSLog("Yggdrasil: Found existing VPN configuration")
-            let config = try? ConfigurationProxy(json: confJson)
-            completionHandler(true, config)
             
+            self.getExistingVPNConfiguration(from: confJson) { result, yggdrasilConfig in
+                completionHandler(result, yggdrasilConfig)
+            }
         } else  {
             
             NSLog("Yggdrasil: Generating new VPN configuration")
@@ -114,13 +115,37 @@ class VpnService {
         }
     }
     
+    private func getExistingVPNConfiguration(from json: Data, completionHandler:@escaping (Bool, ConfigurationProxy?) -> Void) {
+        
+        do {
+            
+            let config = try ConfigurationProxy(json: json)
+           
+            NSLog("Yggdrasil: Clearing peers")
+            config.clear(key: "Peers")
+            
+            self.addPeers(to: config) { result in
+                completionHandler(result, config)
+            }
+            
+        } catch {
+            completionHandler(false, nil)
+        }
+    }
+    
     private func generateVPNConfiguration(completionHandler:@escaping (Bool, ConfigurationProxy?) -> Void) {
         let config = ConfigurationProxy()
         
+        self.addPeers(to: config) { result in
+            completionHandler(result, config)
+        }
+    }
+    
+    private func addPeers(to config: ConfigurationProxy, completionHandler:@escaping (Bool) -> Void) {
         self.bestPeersService.GetBestPeers() { bestPeersResult in
             
             if (!bestPeersResult.isSuccessful) {
-                completionHandler(false, nil)
+                completionHandler(false)
                 return
             }
             
@@ -129,7 +154,7 @@ class VpnService {
                 config.add(peer.toString(), in: "Peers")
             }
             
-            completionHandler(true, config)
+            completionHandler(true)
         }
     }
     

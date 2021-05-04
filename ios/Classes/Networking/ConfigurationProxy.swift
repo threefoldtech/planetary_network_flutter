@@ -78,6 +78,15 @@ class ConfigurationProxy {
         }
     }
     
+    func clear(key: String) {
+        if self.dict != nil {
+            if self.dict![key] as? [Any] != nil {
+                let temp = [Any]()
+                self.dict!.updateValue(temp, forKey: key)
+            }
+        }
+    }
+    
     func remove(_ value: String, from key: String) {
         if self.dict != nil {
             if self.dict![key] as? [String] != nil {
