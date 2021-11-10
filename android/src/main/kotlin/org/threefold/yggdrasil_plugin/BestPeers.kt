@@ -1,5 +1,7 @@
+package org.threefold.yggdrasil_plugin
+
 import android.util.Log
-import io.github.chronosx88.yggdrasil.models.PeerInfo
+import org.threefold.yggdrasil_plugin.models.PeerInfo
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.*

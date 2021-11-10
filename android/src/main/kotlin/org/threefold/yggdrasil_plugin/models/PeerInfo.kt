@@ -1,4 +1,4 @@
-package io.github.chronosx88.yggdrasil.models
+package org.threefold.yggdrasil_plugin.models
 
 import android.content.Context
 import com.hbb20.CCPCountry
