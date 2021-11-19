@@ -46,18 +46,21 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     ): Boolean {
 
         val taskRunner = TaskRunner()
+        Log.d("ygg", "preparing vpn service ")
+        
+        val intent = VpnService.prepare(context)
+        if (intent != null) {
+            Log.d("ygg", "Start activity for result... ")
+            activity.startActivityForResult(intent, VPN_REQUEST_CODE)
+            return false;
+        }
+
         val connectToYggdrasil: (ArrayList<PeerInfo>) -> Unit = { data ->
             if (data.size < 3) {
                 // @todo error not enough available peers
             }
 
-            Log.d("ygg", "preparing vpn service ")
-            val intent = VpnService.prepare(context)
-            if (intent != null) {
-                Log.d("ygg", "Start activity for result... ")
-                activity.startActivityForResult(intent, VPN_REQUEST_CODE)
-                // return false;
-            }
+     
 
             config = ConfigurationProxy(context)
             Log.d("pubkey", signingPublicKey) // Replace public key with app key
@@ -156,6 +159,10 @@ class YggdrasilPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
                         //     Log.d("ygg", "Enabled");
                         // }
+                        if(intent.getStringExtra("ip") == null){
+                            currentIp = "";
+                            return;
+                        }
                         if (currentIp != intent.getStringExtra("ip")) {
                             // ip has changed!.
                             currentIp = intent.getStringExtra("ip")
