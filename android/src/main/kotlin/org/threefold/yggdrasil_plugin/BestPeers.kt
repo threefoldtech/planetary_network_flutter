@@ -36,7 +36,7 @@ internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
             try{
                 val socket = Socket()
 
-                socket.connect(InetSocketAddress(uri.host, uri.port), 100)
+                socket.connect(InetSocketAddress(uri.host, uri.port), 150)
                 socket.close()
                 val finish = System.currentTimeMillis()
                 Log.d("ping", "pingTime: " + (finish - start))
@@ -47,14 +47,14 @@ internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
                 val peer = PeerInfo(scheme, ia, port, ping)
 
                 peers.add(peer)
-                if(ping < 75){
+                if(ping < 150){
                     fastPeers++;
                 }
             }catch (e: Exception){
                 Log.d("ping", "Ping failed for host " + uri.host);
             }
             if(fastPeers > 2){
-                Log.d("ygg", "Found 3 fast hosts (<75ms)");
+                Log.d("ygg", "Found 3 fast hosts (<150ms)");
                 break;
             }
         }
