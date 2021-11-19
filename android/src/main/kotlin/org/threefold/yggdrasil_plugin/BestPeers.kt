@@ -11,7 +11,7 @@ import java.util.concurrent.Callable
 internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
     override fun  call(): ArrayList<PeerInfo> {
         // Some long running task
-        val google = URL("https://jimber.io/peers.html")
+        val google = URL("https://publicpeers.neilalexander.dev/")
         val `in` = BufferedReader(InputStreamReader(google.openStream()))
         var input: String?
         val stringBuffer = StringBuffer()
