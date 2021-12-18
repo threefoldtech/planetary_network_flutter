@@ -11,11 +11,21 @@
 #include "Universe.objc.h"
 
 
+@class ConfigMulticastInterfaceConfig;
 @class ConfigNodeConfig;
-@class ConfigNodeState;
-@class ConfigSessionFirewall;
-@class ConfigSwitchOptions;
-@class ConfigTunnelRouting;
+
+@interface ConfigMulticastInterfaceConfig : NSObject <goSeqRefInterface> {
+}
+@property(strong, readonly) _Nonnull id _ref;
+
+- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
+- (nonnull instancetype)init;
+@property (nonatomic) NSString* _Nonnull regex;
+@property (nonatomic) BOOL beacon;
+@property (nonatomic) BOOL listen;
+// skipped field MulticastInterfaceConfig.Port with unsupported type: uint16
+
+@end
 
 /**
  * NodeConfig is the main configuration structure, containing configuration
@@ -28,6 +38,8 @@ supply one of these structs to the Yggdrasil core when starting a node.
 
 - (nonnull instancetype)initWithRef:(_Nonnull id)ref;
 - (nonnull instancetype)init;
+// skipped field NodeConfig.RWMutex with unsupported type: sync.RWMutex
+
 // skipped field NodeConfig.Peers with unsupported type: []string
 
 // skipped field NodeConfig.InterfacePeers with unsupported type: map[string][]string
@@ -35,127 +47,30 @@ supply one of these structs to the Yggdrasil core when starting a node.
 // skipped field NodeConfig.Listen with unsupported type: []string
 
 @property (nonatomic) NSString* _Nonnull adminListen;
-// skipped field NodeConfig.MulticastInterfaces with unsupported type: []string
+// skipped field NodeConfig.MulticastInterfaces with unsupported type: []github.com/yggdrasil-network/yggdrasil-go/src/config.MulticastInterfaceConfig
 
-// skipped field NodeConfig.AllowedEncryptionPublicKeys with unsupported type: []string
+// skipped field NodeConfig.AllowedPublicKeys with unsupported type: []string
 
-@property (nonatomic) NSString* _Nonnull encryptionPublicKey;
-@property (nonatomic) NSString* _Nonnull encryptionPrivateKey;
-@property (nonatomic) NSString* _Nonnull signingPublicKey;
-@property (nonatomic) NSString* _Nonnull signingPrivateKey;
-// skipped field NodeConfig.LinkLocalTCPPort with unsupported type: uint16
-
+@property (nonatomic) NSString* _Nonnull publicKey;
+@property (nonatomic) NSString* _Nonnull privateKey;
 @property (nonatomic) NSString* _Nonnull ifName;
-// skipped field NodeConfig.IfMTU with unsupported type: github.com/yggdrasil-network/yggdrasil-go/src/types.MTU
-
-// skipped field NodeConfig.SessionFirewall with unsupported type: github.com/yggdrasil-network/yggdrasil-go/src/config.SessionFirewall
-
-// skipped field NodeConfig.TunnelRouting with unsupported type: github.com/yggdrasil-network/yggdrasil-go/src/config.TunnelRouting
-
-// skipped field NodeConfig.SwitchOptions with unsupported type: github.com/yggdrasil-network/yggdrasil-go/src/config.SwitchOptions
+// skipped field NodeConfig.IfMTU with unsupported type: uint64
 
 @property (nonatomic) BOOL nodeInfoPrivacy;
 // skipped field NodeConfig.NodeInfo with unsupported type: map[string]interface{}
 
-/**
- * NewEncryptionKeys replaces the encryption keypair in the NodeConfig with a
-new encryption keypair. The encryption keys are used by the router to encrypt
-traffic and to derive the node ID and IPv6 address/subnet of the node, so
-this is equivalent to discarding the node's identity on the network.
- */
-- (void)newEncryptionKeys;
+- (void)lock;
 /**
  * NewSigningKeys replaces the signing keypair in the NodeConfig with a new
 signing keypair. The signing keys are used by the switch to derive the
 structure of the spanning tree.
  */
-- (void)newSigningKeys;
+- (void)newKeys;
+- (void)rLock;
+// skipped method NodeConfig.RLocker with unsupported parameter or return types
+
+- (void)rUnlock;
+- (void)unlock;
 @end
-
-/**
- * NodeState represents the active and previous configuration of an Yggdrasil
-node. A NodeState object is returned when starting an Yggdrasil node. Note
-that this structure and related functions are likely to disappear soon.
- */
-@interface ConfigNodeState : NSObject <goSeqRefInterface> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-// skipped field NodeState.Current with unsupported type: github.com/yggdrasil-network/yggdrasil-go/src/config.NodeConfig
-
-// skipped field NodeState.Previous with unsupported type: github.com/yggdrasil-network/yggdrasil-go/src/config.NodeConfig
-
-// skipped field NodeState.Mutex with unsupported type: sync.RWMutex
-
-// skipped method NodeState.GetCurrent with unsupported parameter or return types
-
-// skipped method NodeState.GetPrevious with unsupported parameter or return types
-
-// skipped method NodeState.Replace with unsupported parameter or return types
-
-@end
-
-/**
- * SessionFirewall controls the session firewall configuration.
- */
-@interface ConfigSessionFirewall : NSObject <goSeqRefInterface> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-@property (nonatomic) BOOL enable;
-@property (nonatomic) BOOL allowFromDirect;
-@property (nonatomic) BOOL allowFromRemote;
-@property (nonatomic) BOOL alwaysAllowOutbound;
-// skipped field SessionFirewall.WhitelistEncryptionPublicKeys with unsupported type: []string
-
-// skipped field SessionFirewall.BlacklistEncryptionPublicKeys with unsupported type: []string
-
-@end
-
-/**
- * SwitchOptions contains tuning options for the switch. These are advanced
-options and shouldn't be changed unless necessary.
- */
-@interface ConfigSwitchOptions : NSObject <goSeqRefInterface> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-// skipped field SwitchOptions.MaxTotalQueueSize with unsupported type: uint64
-
-@end
-
-/**
- * TunnelRouting contains the crypto-key routing tables for tunneling regular
-IPv4 or IPv6 subnets across the Yggdrasil network.
- */
-@interface ConfigTunnelRouting : NSObject <goSeqRefInterface> {
-}
-@property(strong, readonly) _Nonnull id _ref;
-
-- (nonnull instancetype)initWithRef:(_Nonnull id)ref;
-- (nonnull instancetype)init;
-@property (nonatomic) BOOL enable;
-// skipped field TunnelRouting.IPv6RemoteSubnets with unsupported type: map[string]string
-
-// skipped field TunnelRouting.IPv6LocalSubnets with unsupported type: []string
-
-// skipped field TunnelRouting.IPv4RemoteSubnets with unsupported type: map[string]string
-
-// skipped field TunnelRouting.IPv4LocalSubnets with unsupported type: []string
-
-@end
-
-/**
- * Generates default configuration and returns a pointer to the resulting
-NodeConfig. This is used when outputting the -genconf parameter and also when
-using -autoconf.
- */
-FOUNDATION_EXPORT ConfigNodeConfig* _Nullable ConfigGenerateConfig(void);
 
 #endif
