@@ -103,13 +103,12 @@ class TestPage extends StatelessWidget {
     platformVersion = await plugin.platformVersion();
   }
 
-
   void startVPN(BuildContext context) async {
     await plugin.startVpn({
-      'signingPublicKey': 'signingPublicKey',
-      'signingPrivateKey': 'signingPrivateKey', 
-      'encryptionPublicKey': 'encryptionPublicKey',
-      'encryptionPrivateKey': 'encryptionPrivateKey'
+      'signingPublicKey': '620ed6d70c54fdf4accfdadef94a60091f791664566d7423fa4877a62bdc60cc',
+      'signingPrivateKey': '760b5fbb02cfec5fd1899d943060957a17ba5a6383402b7e6c363bb6bcddd451620ed6d70c54fdf4accfdadef94a60091f791664566d7423fa4877a62bdc60cc', 
+      'encryptionPublicKey': '36fc3adb1a3f0a1d62d8e721e37e66e59cbcc0ca347043e82c5ed248f72a6a04',
+      'encryptionPrivateKey': 'f8cff6bb9ffdcf196dca5d7c9aebe97c2bcf6ca554e7110a9f9f597b9b2a7975'
     });
   }
 
