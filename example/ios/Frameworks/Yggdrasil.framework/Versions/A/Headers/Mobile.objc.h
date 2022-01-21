@@ -10,9 +10,7 @@
 #include "ref.h"
 #include "Universe.objc.h"
 
-#include "Dummy.objc.h"
 #include "Config.objc.h"
-#include "Yggdrasil.objc.h"
 
 @class MobileMobileLogger;
 @class MobileYggdrasil;
@@ -44,29 +42,42 @@ in Swift therefore we use the "dummy" TUN interface instead.
  */
 - (NSString* _Nonnull)getAddressString;
 /**
- * GetBoxPubKeyString gets the node's public encryption key
+ * GetCoordsString gets the node's coordinates
  */
-- (NSString* _Nonnull)getBoxPubKeyString;
 - (NSString* _Nonnull)getCoordsString;
+- (NSString* _Nonnull)getDHTJSON;
+/**
+ * GetMTU returns the configured node MTU. This must be called AFTER Start.
+ */
+- (long)getMTU;
 - (NSString* _Nonnull)getPeersJSON;
 /**
- * GetSigPubKeyString gets the node's public signing key
+ * GetPublicKeyString gets the node's public key in hex form
  */
-- (NSString* _Nonnull)getSigPubKeyString;
+- (NSString* _Nonnull)getPublicKeyString;
 /**
  * GetSubnetString gets the node's IPv6 subnet in CIDR notation
  */
 - (NSString* _Nonnull)getSubnetString;
-- (NSString* _Nonnull)getSwitchPeersJSON;
+/**
+ * Recv waits for and reads a packet coming from Yggdrasil. It
+will be a fully formed IPv6 packet
+ */
+- (NSData* _Nullable)recv:(NSError* _Nullable* _Nullable)error;
+/**
+ * Send sends a packet to Yggdrasil. It should be a fully formed
+IPv6 packet
+ */
+- (BOOL)send:(NSData* _Nullable)p0 error:(NSError* _Nullable* _Nullable)error;
 /**
  * StartAutoconfigure starts a node with a randomly generated config
  */
-- (DummyConduitEndpoint* _Nullable)startAutoconfigure:(NSError* _Nullable* _Nullable)error;
+- (BOOL)startAutoconfigure:(NSError* _Nullable* _Nullable)error;
 /**
  * StartJSON starts a node with the given JSON config. You can get JSON config
 (rather than HJSON) by using the GenerateConfigJSON() function
  */
-- (DummyConduitEndpoint* _Nullable)startJSON:(NSData* _Nullable)configjson error:(NSError* _Nullable* _Nullable)error;
+- (BOOL)startJSON:(NSData* _Nullable)configjson error:(NSError* _Nullable* _Nullable)error;
 /**
  * Stop the mobile Yggdrasil instance
  */
@@ -77,5 +88,7 @@ in Swift therefore we use the "dummy" TUN interface instead.
  * GenerateConfigJSON generates mobile-friendly configuration in JSON format
  */
 FOUNDATION_EXPORT NSData* _Nullable MobileGenerateConfigJSON(void);
+
+FOUNDATION_EXPORT NSString* _Nonnull MobileGetVersion(void);
 
 #endif
