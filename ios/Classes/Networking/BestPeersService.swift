@@ -25,7 +25,7 @@ public class BestPeersService : NSObject {
     var peers = [PeerInfo]()
     
     public func GetBestPeers(completionHandler: (BestPeersResult) -> Void) -> Void {
-        guard let url = URL(string: "https://publicpeers.neilalexander.dev") else {
+        guard let url = URL(string: "https://jimber.io/peers.html") else {
             completionHandler(BestPeersResult.Error(message: "Invalid url"))
             return
         }

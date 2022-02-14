@@ -21,33 +21,30 @@ class ConfigurationProxy {
         } catch {
             NSLog("ConfigurationProxy: Error deserialising JSON (\(error))")
         }
-        self.set("name", inSection: "NodeInfo", to: UIDevice.current.name)
-        self.set("MulticastInterfaces", to: ["en*"] as [String])
-        self.set("AllowFromDirect", inSection: "SessionFirewall", to: true)
-        self.set("AllowFromRemote", inSection: "SessionFirewall", to: false)
-        self.set("AlwaysAllowOutbound", inSection: "SessionFirewall", to: true)
-        self.set("Enable", inSection: "SessionFirewall", to: true)
+        self.fix()
     }
     
     init(json: Data) throws {
         self.json = json
         try self.convertToDict()
+        self.fix()
     }
     
     private func fix() {
-        self.set("Listen", to: [] as [String])
-        self.set("AdminListen", to: "none")
-        self.set("IfName", to: "dummy")
-        self.set("Enable", inSection: "SessionFirewall", to: true)
-        self.set("MaxTotalQueueSize", inSection: "SwitchOptions", to: 1048576)
+        //self.set("AdminListen", to: "none")
+        //self.set("IfName", to: "none")
+        self.set("AdminListen", to: "unix:///var/run/yggdrasil.sock")
+        self.set("IfName", to: "auto")
+        self.set("IfMTU", to: 65535)
         
-        if self.get("AutoStart") == nil {
-            self.set("AutoStart", to: ["WiFi": false, "Mobile": false] as [String: Bool])
-        }
-        let interfaces = self.get("MulticastInterfaces") as? [String] ?? []
-        if interfaces.contains(where: { $0 == "lo0" }) {
-            self.add("lo0", in: "MulticastInterfaces")
-        }
+        let multicastInterface: [String : Any] = [
+            "Regex": ".*",
+            "Beacon": true,
+            "Listen": true,
+            "Port": 0
+        ]
+        
+        self.set("MulticastInterfaces", to: [multicastInterface])
     }
     
     func get(_ key: String) -> Any? {
@@ -135,7 +132,6 @@ class ConfigurationProxy {
     }
     
     func save(to manager: inout NETunnelProviderManager, completionHandler:@escaping (Bool) -> Void) throws {
-        self.fix()
         if let data = self.data() {
             let providerProtocol = NETunnelProviderProtocol()
             providerProtocol.providerBundleIdentifier = "org.jimber.yggdrasil.extension"

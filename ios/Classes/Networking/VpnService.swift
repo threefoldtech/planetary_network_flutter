@@ -149,10 +149,17 @@ class VpnService {
                 return
             }
             
-            for peer in bestPeersResult.peers.prefix(3) {
+            NSLog("Yggdrasil: Adding peer tls://51.15.204.214:54321")
+            config.add("tls://51.15.204.214:54321", in: "Peers")
+            NSLog("Yggdrasil: Adding peer tls://51.255.223.60:54232")
+            config.add("tls://51.255.223.60:54232", in: "Peers")
+            NSLog("Yggdrasil: Adding peer tls://62.210.85.80:39575")
+            config.add("tls://62.210.85.80:39575", in: "Peers")
+            
+            /*for peer in bestPeersResult.peers.prefix(3) {
                 NSLog("Yggdrasil: Adding peer \(peer.toString())")
                 config.add(peer.toString(), in: "Peers")
-            }
+            }*/
             
             completionHandler(true)
         }
@@ -200,12 +207,6 @@ class VpnService {
                 if let jsonResponse = try? JSONSerialization.jsonObject(with: peers!, options: []) as? [[String: Any]] {
                     self.yggdrasilPeers = jsonResponse
                     NotificationCenter.default.post(name: .YggdrasilPeersUpdated, object: nil)
-                }
-            }
-            try? session.sendProviderMessage("switchpeers".data(using: .utf8)!) { (switchpeers) in
-                if let jsonResponse = try? JSONSerialization.jsonObject(with: switchpeers!, options: []) as? [[String: Any]] {
-                    self.yggdrasilSwitchPeers = jsonResponse
-                    NotificationCenter.default.post(name: .YggdrasilSwitchPeersUpdated, object: nil)
                 }
             }
         }

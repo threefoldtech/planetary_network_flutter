@@ -126,6 +126,12 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     
     @objc func onYggdrasilSelfUpdated(notification: NSNotification) {
         NSLog("Yggdrasil: Notification onYggdrasilSelfUpdated received")
+        
+        if let dict = notification.userInfo, let address = dict["address"] as? String {
+            
+            NSLog("Test notification")
+            NSLog(address)
+        }
         self.logYggdrasilData()
     }
     

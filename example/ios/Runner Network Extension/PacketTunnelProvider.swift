@@ -10,19 +10,23 @@ import Yggdrasil
 
 class PacketTunnelProvider: NEPacketTunnelProvider {
     var yggdrasil: MobileYggdrasil = MobileYggdrasil()
-    var conduit: DummyConduitEndpoint? = nil
     var yggdrasilConfig: ConfigurationProxy?
+    var started: Bool = false
     
     override init() {
         super.init()
     }
     
     @objc func readPacketsFromTun() {
-        if let conduit = self.conduit {
+        while(started) {
             autoreleasepool {
                 self.packetFlow.readPackets { (packets: [Data], protocols: [NSNumber]) in
                     for packet in packets {
-                        conduit.send(packet)
+                        do {
+                            try self.yggdrasil.send(packet)
+                        } catch {
+                            NSLog("readPacketsFromTun produced an error: " + error.localizedDescription)
+                        }
                     }
                     self.readPacketsFromTun()
                 }
@@ -31,10 +35,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     @objc func writePacketsToTun() {
-        while let conduit = self.conduit {
+        while(started) {
             autoreleasepool {
-                if let data = conduit.recv() {
+                do {
+                    let data = try self.yggdrasil.recv()
                     self.packetFlow.writePackets([data], withProtocols: [NSNumber](repeating: AF_INET6 as NSNumber, count: 1))
+                } catch {
+                    NSLog("writePacketsToTun produced an error: " + error.localizedDescription)
                 }
             }
         }
@@ -43,6 +50,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     func startYggdrasil() -> Error? {
         var err: Error? = nil
 
+        Darwin.sleep(10)
+        
         self.setTunnelNetworkSettings(nil) { (error: Error?) -> Void in
             NSLog("Starting Yggdrasil")
             
@@ -58,12 +67,13 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 NSLog("Configuration loaded")
                 
                 do {
-                    self.conduit = try self.yggdrasil.startJSON(config.data())
+                    //let str = String(decoding: config.data()!, as: UTF8.self)
+                    try self.yggdrasil.startJSON(config.data())
                 } catch {
                     NSLog("Starting Yggdrasil process produced an error: " + error.localizedDescription)
                     return
                 }
-
+                                
                 let address = self.yggdrasil.getAddressString()
                 let subnet = self.yggdrasil.getSubnetString()
                 
@@ -73,7 +83,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 let tunnelNetworkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: address)
                 tunnelNetworkSettings.ipv6Settings = NEIPv6Settings(addresses: [address], networkPrefixLengths: [7])
                 tunnelNetworkSettings.ipv6Settings?.includedRoutes = [NEIPv6Route(destinationAddress: "0200::", networkPrefixLength: 7)]
-
+                                
                 NSLog("Setting tunnel network settings...")
                 
                 self.setTunnelNetworkSettings(tunnelNetworkSettings) { (error: Error?) -> Void in
@@ -91,6 +101,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                         let writethread: Thread = Thread(target: self, selector: #selector(self.writePacketsToTun), object: nil)
                         writethread.name = "TUN Packet Writer"
                         writethread.qualityOfService = .utility
+                        
+                        self.started = true
                         
                         readthread.start()
                         writethread.start()
@@ -121,12 +133,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+        if (!self.started) {
+            return
+        }
+        
         try? self.yggdrasil.stop()
+        
+        self.started = false
+        
         super.stopTunnel(with: reason, completionHandler: completionHandler)
     }
     
     override func handleAppMessage(_ messageData: Data, completionHandler: ((Data?) -> Void)? = nil) {
         let request = String(data: messageData, encoding: .utf8)
+        
         switch request {
             case "address":
                 completionHandler?(self.yggdrasil.getAddressString().data(using: .utf8))
@@ -136,9 +156,8 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                 completionHandler?(self.yggdrasil.getCoordsString().data(using: .utf8))
             case "peers":
                 completionHandler?(self.yggdrasil.getPeersJSON().data(using: .utf8))
-            case "switchpeers":
-                completionHandler?(self.yggdrasil.getSwitchPeersJSON().data(using: .utf8))
             default:
                 completionHandler?(nil)
         }
-    }}
+    }
+}
