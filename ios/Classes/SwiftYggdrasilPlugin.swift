@@ -33,8 +33,6 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilPeersUpdated), name: NSNotification.Name.YggdrasilPeersUpdated, object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSwitchPeersUpdated), name: NSNotification.Name.YggdrasilSwitchPeersUpdated, object: nil)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(self.onYggdrasilSettingsUpdated), name: NSNotification.Name.YggdrasilSettingsUpdated, object: nil)
     }
     
@@ -117,7 +115,6 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     }
     
     func logYggdrasilData() {
-        NSLog("Yggdrasil: Connection Info")
         NSLog("IP Address: \(self.vpnService.yggdrasilSelfIP)")
         NSLog("Subnet: \(self.vpnService.yggdrasilSelfSubnet)")
 
@@ -126,12 +123,6 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
     
     @objc func onYggdrasilSelfUpdated(notification: NSNotification) {
         NSLog("Yggdrasil: Notification onYggdrasilSelfUpdated received")
-        
-        if let dict = notification.userInfo, let address = dict["address"] as? String {
-            
-            NSLog("Test notification")
-            NSLog(address)
-        }
         self.logYggdrasilData()
     }
     

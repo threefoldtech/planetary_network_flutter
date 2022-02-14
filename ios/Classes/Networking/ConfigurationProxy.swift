@@ -33,18 +33,16 @@ class ConfigurationProxy {
     private func fix() {
         self.set("AdminListen", to: "none")
         self.set("IfName", to: "none")
-        //self.set("AdminListen", to: "unix:///var/run/yggdrasil.sock")
-        //self.set("IfName", to: "auto")
         self.set("IfMTU", to: 65535)
+                
+        if self.get("AutoStart") == nil {
+            self.set("AutoStart", to: ["WiFi": false, "Mobile": false] as [String: Bool])
+        }
         
-        /*let multicastInterface: [String : Any] = [
-            "Regex": ".*",
-            "Beacon": true,
-            "Listen": true,
-            "Port": 0
-        ]
-        
-        self.set("MulticastInterfaces", to: [multicastInterface])*/
+        let interfaces = self.get("MulticastInterfaces") as? [String] ?? []
+        if interfaces.contains(where: { $0 == "lo0" }) {
+            self.add("lo0", in: "MulticastInterfaces")
+        }
     }
     
     func get(_ key: String) -> Any? {

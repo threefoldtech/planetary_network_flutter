@@ -33,19 +33,8 @@ class ConfigurationProxy {
     private func fix() {
         self.set("AdminListen", to: "none")
         self.set("IfName", to: "none")
-        //self.set("AdminListen", to: "unix:///var/run/yggdrasil.sock")
-        //self.set("IfName", to: "auto")
         self.set("IfMTU", to: 65535)
-        
-        /*let multicastInterface: [String : Any] = [
-            "Regex": ".*",
-            "Beacon": true,
-            "Listen": true,
-            "Port": 0
-        ]
-        
-        self.set("MulticastInterfaces", to: [multicastInterface])*/
-        
+                
         if self.get("AutoStart") == nil {
             self.set("AutoStart", to: ["WiFi": false, "Mobile": false] as [String: Bool])
         }
