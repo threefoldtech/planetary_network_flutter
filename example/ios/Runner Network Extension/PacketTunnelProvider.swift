@@ -28,7 +28,6 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
                             NSLog("readPacketsFromTun produced an error: " + error.localizedDescription)
                         }
                     }
-                    self.readPacketsFromTun()
                 }
             }
         }
