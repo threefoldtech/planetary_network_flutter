@@ -45,6 +45,15 @@ class ConfigurationProxy {
         ]
         
         self.set("MulticastInterfaces", to: [multicastInterface])*/
+        
+        if self.get("AutoStart") == nil {
+            self.set("AutoStart", to: ["WiFi": false, "Mobile": false] as [String: Bool])
+        }
+        
+        let interfaces = self.get("MulticastInterfaces") as? [String] ?? []
+        if interfaces.contains(where: { $0 == "lo0" }) {
+            self.add("lo0", in: "MulticastInterfaces")
+        }
     }
     
     func get(_ key: String) -> Any? {
@@ -157,7 +166,7 @@ class ConfigurationProxy {
                     print(error)
                 } else {
                     print("Save successfully")
-                    NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettıingsUpdated, object: self)
+                    NotificationCenter.default.post(name: NSNotification.Name.YggdrasilSettingsUpdated, object: self)
                 }
             })
         }
