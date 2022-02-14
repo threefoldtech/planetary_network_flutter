@@ -149,17 +149,18 @@ class VpnService {
                 return
             }
             
-            NSLog("Yggdrasil: Adding peer tls://51.15.204.214:54321")
+            /*NSLog("Yggdrasil: Adding peer tls://51.15.204.214:54321")
             config.add("tls://51.15.204.214:54321", in: "Peers")
             NSLog("Yggdrasil: Adding peer tls://51.255.223.60:54232")
             config.add("tls://51.255.223.60:54232", in: "Peers")
             NSLog("Yggdrasil: Adding peer tls://62.210.85.80:39575")
             config.add("tls://62.210.85.80:39575", in: "Peers")
+            */
             
-            /*for peer in bestPeersResult.peers.prefix(3) {
+            for peer in bestPeersResult.peers.prefix(3) {
                 NSLog("Yggdrasil: Adding peer \(peer.toString())")
                 config.add(peer.toString(), in: "Peers")
-            }*/
+            }
             
             completionHandler(true)
         }

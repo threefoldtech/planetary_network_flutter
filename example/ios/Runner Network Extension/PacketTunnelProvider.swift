@@ -50,7 +50,7 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     func startYggdrasil() -> Error? {
         var err: Error? = nil
 
-        Darwin.sleep(10)
+        //Darwin.sleep(10)
         
         self.setTunnelNetworkSettings(nil) { (error: Error?) -> Void in
             NSLog("Starting Yggdrasil")
