@@ -9,7 +9,7 @@ class YggdrasilPlugin {
 
   MethodChannel _channel =  const MethodChannel('yggdrasil_plugin');
   EventChannel _eventChannel = const EventChannel('yggdrasil_plugin/events');
-  onReportIpFnc _reportFnc;
+  late onReportIpFnc _reportFnc;
   static final YggdrasilPlugin _singleton = YggdrasilPlugin._internal();
 
   init(){
@@ -54,11 +54,11 @@ class YggdrasilPlugin {
 
   }
 
-  void _onEvent(Object event) {
+  void _onEvent(dynamic event) {
     _reportFnc("$event");
   }
 
-  void _onError(Object error) {
+  void _onError(dynamic error) {
     
   }
 }
