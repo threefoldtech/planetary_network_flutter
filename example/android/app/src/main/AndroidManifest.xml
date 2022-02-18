@@ -13,7 +13,7 @@
         android:label="yggdrasil_plugin_example"
         android:icon="@mipmap/ic_launcher">
         <service
-            android:name="io.github.chronosx88.yggdrasil.YggdrasilTunService"
+            android:name="org.threefold.yggdrasil_plugin.PacketTunnelProvider"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_VPN_SERVICE">

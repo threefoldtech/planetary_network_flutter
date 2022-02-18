@@ -14,25 +14,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
-
-
     super.initState();
-
   }
-
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: TestPage()
-    );
+    return MaterialApp(home: TestPage());
   }
-
 }
-
 
 class TestPage extends StatelessWidget {
   String _platformVersion = 'Unknown';

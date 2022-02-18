@@ -1,5 +1,7 @@
+package org.threefold.yggdrasil_plugin
+
 import android.util.Log
-import io.github.chronosx88.yggdrasil.models.PeerInfo
+import org.threefold.yggdrasil_plugin.models.PeerInfo
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.*
@@ -9,7 +11,7 @@ import java.util.concurrent.Callable
 internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
     override fun  call(): ArrayList<PeerInfo> {
         // Some long running task
-        val google = URL("https://jimber.io/peers.html")
+        val google = URL("https://publicpeers.neilalexander.dev/")
         val `in` = BufferedReader(InputStreamReader(google.openStream()))
         var input: String?
         val stringBuffer = StringBuffer()
@@ -34,7 +36,7 @@ internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
             try{
                 val socket = Socket()
 
-                socket.connect(InetSocketAddress(uri.host, uri.port), 100)
+                socket.connect(InetSocketAddress(uri.host, uri.port), 150)
                 socket.close()
                 val finish = System.currentTimeMillis()
                 Log.d("ping", "pingTime: " + (finish - start))
@@ -45,14 +47,14 @@ internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
                 val peer = PeerInfo(scheme, ia, port, ping)
 
                 peers.add(peer)
-                if(ping < 75){
+                if(ping < 150){
                     fastPeers++;
                 }
             }catch (e: Exception){
                 Log.d("ping", "Ping failed for host " + uri.host);
             }
             if(fastPeers > 2){
-                Log.d("ygg", "Found 3 fast hosts (<75ms)");
+                Log.d("ygg", "Found 3 fast hosts (<150ms)");
                 break;
             }
         }
@@ -69,3 +71,4 @@ internal class GetBestPeers() : Callable<ArrayList<PeerInfo>> {
 
 
 
+ 
