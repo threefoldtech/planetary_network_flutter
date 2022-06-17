@@ -56,7 +56,7 @@ public class SwiftYggdrasilPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
                 result(false)
                 return
             }
-            
+
             startVpn(with: keys) { success in
                 result(success)
             }
