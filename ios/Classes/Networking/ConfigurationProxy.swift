@@ -132,7 +132,7 @@ class ConfigurationProxy {
     func save(to manager: inout NETunnelProviderManager, completionHandler:@escaping (Bool) -> Void) throws {
         if let data = self.data() {
             let providerProtocol = NETunnelProviderProtocol()
-            providerProtocol.providerBundleIdentifier = "org.jimber.threebot.yggdrasil.extension"
+            providerProtocol.providerBundleIdentifier = "org.jimber.yggdrasil.extension"
             providerProtocol.providerConfiguration = [ "json": data ]
             providerProtocol.serverAddress = "yggdrasil"
             providerProtocol.username = self.get("EncryptionPublicKey") as? String ?? "(unknown public key)"

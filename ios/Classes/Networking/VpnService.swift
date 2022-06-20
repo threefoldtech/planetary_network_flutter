@@ -12,7 +12,7 @@ class VpnService {
     var vpnManager: NETunnelProviderManager
     let bestPeersService: BestPeersService
     
-    let yggdrasilComponent = "org.jimber.threebot.yggdrasil.extension"
+    let yggdrasilComponent = "org.jimber.yggdrasil.extension"
     var yggdrasilConfig: ConfigurationProxy? = nil
     var yggdrasilAdminTimer: DispatchSourceTimer?
     var yggdrasilSelfIP: String = "N/A"
